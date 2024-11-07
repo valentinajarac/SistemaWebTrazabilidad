@@ -13,9 +13,16 @@ public class Remission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "fecha_despacho")
     private LocalDate fechaDespacho;
+
+    @Column(name = "canastillas_enviadas")
     private Integer canastillasEnviadas;
+
+    @Column(name = "kilos_promedio")
     private Double kilosPromedio;
+
+    @Column(name = "total_kilos")
     private Double totalKilos;
 
     @Enumerated(EnumType.STRING)

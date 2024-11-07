@@ -1,6 +1,7 @@
 package com.trazafrutas.controller;
 
 import com.trazafrutas.dto.ApiResponse;
+import com.trazafrutas.dto.MonthlyStats;
 import com.trazafrutas.model.Remission;
 import com.trazafrutas.model.User;
 import com.trazafrutas.model.enums.Role;
@@ -128,7 +129,7 @@ public class RemissionController {
         if (roleCheck != null) return roleCheck;
 
         try {
-            List<Object[]> summary = remissionService.getMonthlySummary(user.getId());
+            List<MonthlyStats> summary = remissionService.getMonthlySummary(user.getId());
             return ResponseEntity.ok(new ApiResponse(true, "Resumen mensual obtenido exitosamente", summary));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

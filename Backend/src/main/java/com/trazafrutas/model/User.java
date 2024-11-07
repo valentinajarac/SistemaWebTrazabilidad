@@ -19,8 +19,13 @@ public class User implements UserDetails {
     private Long id;
 
     private String cedula;
+
+    @Column(name = "nombre_completo")
     private String nombreCompleto;
+
+    @Column(name = "codigo_trazabilidad")
     private String codigoTrazabilidad;
+
     private String municipio;
     private String telefono;
     private String usuario;

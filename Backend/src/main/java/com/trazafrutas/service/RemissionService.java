@@ -1,5 +1,6 @@
 package com.trazafrutas.service;
 
+import com.trazafrutas.dto.MonthlyStats;
 import com.trazafrutas.exception.EntityNotFoundException;
 import com.trazafrutas.model.*;
 import com.trazafrutas.repository.*;
@@ -148,7 +149,7 @@ public class RemissionService {
         remissionRepository.deleteById(id);
     }
 
-    public List<Object[]> getMonthlySummary(Long userId) {
+    public List<MonthlyStats> getMonthlySummary(Long userId) {
         return remissionRepository.getMonthlySummaryByUserId(userId);
     }
 

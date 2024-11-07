@@ -19,19 +19,26 @@ public class InitialDataConfig {
     @Bean
     public CommandLineRunner initializeData() {
         return args -> {
+            // Verificar si ya existe un usuario admin
             if (!userRepository.existsByUsuario("admin")) {
-                User adminUser = new User();
-                adminUser.setUsuario("admin");
-                adminUser.setPassword(passwordEncoder.encode("admin123"));
-                adminUser.setCedula("1234567890");
-                adminUser.setNombreCompleto("Administrador Sistema");
-                adminUser.setCodigoTrazabilidad("ADMIN001");
-                adminUser.setMunicipio("Bogotá");
-                adminUser.setTelefono("3001234567");
-                adminUser.setRole(Role.ADMIN);
+                try {
+                    // Crear usuario administrador
+                    User adminUser = new User();
+                    adminUser.setUsuario("admin");
+                    adminUser.setPassword(passwordEncoder.encode("admin123"));
+                    adminUser.setCedula("1234567890");
+                    adminUser.setNombreCompleto("Administrador Sistema");
+                    adminUser.setCodigoTrazabilidad("ADMIN001");
+                    adminUser.setMunicipio("Bogotá");
+                    adminUser.setTelefono("3001234567");
+                    adminUser.setRole(Role.ADMIN); // Asegurarse de que el rol sea ADMIN
 
-                userRepository.save(adminUser);
-                System.out.println("Usuario administrador creado exitosamente");
+                    userRepository.save(adminUser);
+                    System.out.println("Usuario administrador creado exitosamente");
+                } catch (Exception e) {
+                    System.err.println("Error al crear usuario administrador: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         };
     }
