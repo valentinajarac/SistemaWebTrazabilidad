@@ -13436,3 +13436,130 @@ Caused by: org.hibernate.query.SemanticException: Operand of - is of type 'java.
 2024-11-07 18:12:18 [http-nio-8080-exec-3] DEBUG c.trazafrutas.service.ClientService [b00f001c-1d43-490a-aa96-403c1eee050d] [admin] [0:0:0:0:0:0:0:1] - → Iniciando ClientService.getAllClients
 2024-11-07 18:12:18 [http-nio-8080-exec-3] DEBUG c.trazafrutas.service.ClientService [b00f001c-1d43-490a-aa96-403c1eee050d] [admin] [0:0:0:0:0:0:0:1] - ← Completado ClientService.getAllClients en 51ms
 2024-11-07 18:12:18 [http-nio-8080-exec-3] DEBUG c.t.controller.ClientController [b00f001c-1d43-490a-aa96-403c1eee050d] [admin] [0:0:0:0:0:0:0:1] - ← Completado ClientController.getAllClients en 51ms
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 18ms
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 108ms
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 3ms
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG c.t.controller.UserController [b1d97581-5081-4288-8bcf-ddc29ee6f6ee] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserController.getAllUsers
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG com.trazafrutas.service.UserService [b1d97581-5081-4288-8bcf-ddc29ee6f6ee] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserService.getAllUsers
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG com.trazafrutas.service.UserService [b1d97581-5081-4288-8bcf-ddc29ee6f6ee] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserService.getAllUsers en 170ms
+2024-11-07 18:17:14 [http-nio-8080-exec-5] DEBUG c.t.controller.UserController [b1d97581-5081-4288-8bcf-ddc29ee6f6ee] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserController.getAllUsers en 170ms
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 2ms
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 40ms
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 4ms
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG c.t.controller.UserController [74bc68ec-7a84-43c5-8641-ab7fee284b27] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserController.getAllUsers
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG com.trazafrutas.service.UserService [74bc68ec-7a84-43c5-8641-ab7fee284b27] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserService.getAllUsers
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG com.trazafrutas.service.UserService [74bc68ec-7a84-43c5-8641-ab7fee284b27] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserService.getAllUsers en 38ms
+2024-11-07 18:17:14 [http-nio-8080-exec-4] DEBUG c.t.controller.UserController [74bc68ec-7a84-43c5-8641-ab7fee284b27] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserController.getAllUsers en 38ms
+2024-11-07 18:17:16 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:16 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:16 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 3ms
+2024-11-07 18:17:16 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:16 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 3ms
+2024-11-07 18:17:16 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:16 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 49ms
+2024-11-07 18:17:16 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 135ms
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:17 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 92ms
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 3ms
+2024-11-07 18:17:17 [http-nio-8080-exec-8] DEBUG c.t.controller.DashboardController [da7a9f45-be26-436a-9c62-8d3b8686886b] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardController.getStats
+2024-11-07 18:17:17 [http-nio-8080-exec-8] DEBUG c.t.service.DashboardService [da7a9f45-be26-436a-9c62-8d3b8686886b] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardService.getAdminStats
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG c.t.controller.DashboardController [085d52cb-62e2-481b-a81e-7ace53b77c4a] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardController.getMonthlyStats
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG c.t.service.DashboardService [085d52cb-62e2-481b-a81e-7ace53b77c4a] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardService.getMonthlyStats
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG c.t.service.DashboardService [085d52cb-62e2-481b-a81e-7ace53b77c4a] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardService.getMonthlyStats en 52ms
+2024-11-07 18:17:17 [http-nio-8080-exec-6] DEBUG c.t.controller.DashboardController [085d52cb-62e2-481b-a81e-7ace53b77c4a] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardController.getMonthlyStats en 53ms
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:17 [http-nio-8080-exec-8] DEBUG c.t.service.DashboardService [da7a9f45-be26-436a-9c62-8d3b8686886b] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardService.getAdminStats en 58ms
+2024-11-07 18:17:17 [http-nio-8080-exec-8] DEBUG c.t.controller.DashboardController [da7a9f45-be26-436a-9c62-8d3b8686886b] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardController.getStats en 58ms
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 2ms
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 3ms
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 46ms
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 4ms
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG c.t.controller.DashboardController [400e2717-656b-4ed1-9fee-0e720d012c97] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardController.getMonthlyStats
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 45ms
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 3ms
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG c.t.controller.DashboardController [92bdb167-f259-4e83-a72a-b22ceba781b3] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardController.getStats
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG c.t.service.DashboardService [400e2717-656b-4ed1-9fee-0e720d012c97] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardService.getMonthlyStats
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG c.t.service.DashboardService [92bdb167-f259-4e83-a72a-b22ceba781b3] [admin] [0:0:0:0:0:0:0:1] - → Iniciando DashboardService.getAdminStats
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG c.t.service.DashboardService [400e2717-656b-4ed1-9fee-0e720d012c97] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardService.getMonthlyStats en 38ms
+2024-11-07 18:17:17 [http-nio-8080-exec-9] DEBUG c.t.controller.DashboardController [400e2717-656b-4ed1-9fee-0e720d012c97] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardController.getMonthlyStats en 45ms
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG c.t.service.DashboardService [92bdb167-f259-4e83-a72a-b22ceba781b3] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardService.getAdminStats en 53ms
+2024-11-07 18:17:17 [http-nio-8080-exec-7] DEBUG c.t.controller.DashboardController [92bdb167-f259-4e83-a72a-b22ceba781b3] [admin] [0:0:0:0:0:0:0:1] - ← Completado DashboardController.getStats en 56ms
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 2ms
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 45ms
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 3ms
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG c.t.controller.UserController [382c4354-5004-424b-ae83-91dc57c2e721] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserController.getAllUsers
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG com.trazafrutas.service.UserService [382c4354-5004-424b-ae83-91dc57c2e721] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserService.getAllUsers
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG com.trazafrutas.service.UserService [382c4354-5004-424b-ae83-91dc57c2e721] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserService.getAllUsers en 172ms
+2024-11-07 18:17:21 [http-nio-8080-exec-10] DEBUG c.t.controller.UserController [382c4354-5004-424b-ae83-91dc57c2e721] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserController.getAllUsers en 173ms
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 1ms
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 40ms
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 3ms
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG c.t.controller.UserController [5feba720-df19-4669-a645-63c92823c7df] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserController.getAllUsers
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG com.trazafrutas.service.UserService [5feba720-df19-4669-a645-63c92823c7df] [admin] [0:0:0:0:0:0:0:1] - → Iniciando UserService.getAllUsers
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG com.trazafrutas.service.UserService [5feba720-df19-4669-a645-63c92823c7df] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserService.getAllUsers en 149ms
+2024-11-07 18:17:21 [http-nio-8080-exec-3] DEBUG c.t.controller.UserController [5feba720-df19-4669-a645-63c92823c7df] [admin] [0:0:0:0:0:0:0:1] - ← Completado UserController.getAllUsers en 149ms
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 1ms
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 181ms
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 5ms
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG c.t.controller.AuthController [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - → Iniciando AuthController.login
+2024-11-07 18:17:30 [http-nio-8080-exec-6] DEBUG com.trazafrutas.service.AuthService [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - → Iniciando AuthService.authenticate
+2024-11-07 18:17:31 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:31 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - ← Completado CustomUserDetailsService.loadUserByUsername en 149ms
+2024-11-07 18:17:31 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - → Iniciando JwtService.generateToken
+2024-11-07 18:17:31 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - ← Completado JwtService.generateToken en 26ms
+2024-11-07 18:17:31 [http-nio-8080-exec-6] DEBUG com.trazafrutas.service.AuthService [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - ← Completado AuthService.authenticate en 350ms
+2024-11-07 18:17:31 [http-nio-8080-exec-6] DEBUG c.t.controller.AuthController [c7e86c7f-1e2e-4a4a-bf71-56e0c75aed07] [admin] [0:0:0:0:0:0:0:1] - ← Completado AuthController.login en 351ms
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG c.t.controller.AuthController [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - → Iniciando AuthController.login
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG com.trazafrutas.service.AuthService [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - → Iniciando AuthService.authenticate
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - ← Completado CustomUserDetailsService.loadUserByUsername en 49ms
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - → Iniciando JwtService.generateToken
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - ← Completado JwtService.generateToken en 1ms
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG com.trazafrutas.service.AuthService [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - ← Completado AuthService.authenticate en 120ms
+2024-11-07 18:17:41 [http-nio-8080-exec-8] DEBUG c.t.controller.AuthController [315582d1-33b6-460d-9caa-febd2a1fdc85] [anonymous] [0:0:0:0:0:0:0:1] - ← Completado AuthController.login en 121ms
+2024-11-07 18:22:32 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 3ms
+2024-11-07 18:22:32 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 4ms
+2024-11-07 18:22:32 [http-nio-8080-exec-5] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-4] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-5] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 93ms
+2024-11-07 18:22:32 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:22:32 [http-nio-8080-exec-4] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 93ms
+2024-11-07 18:22:32 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:22:32 [http-nio-8080-exec-5] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 5ms
+2024-11-07 18:22:32 [http-nio-8080-exec-4] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 6ms
+2024-11-07 18:22:32 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 15ms
+2024-11-07 18:22:32 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 17ms
+2024-11-07 18:22:32 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 18:22:32 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 61ms
+2024-11-07 18:22:32 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:22:32 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 5ms
+2024-11-07 18:22:32 [http-nio-8080-exec-6] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 76ms
+2024-11-07 18:22:32 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 18:22:32 [http-nio-8080-exec-6] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 4ms
+2024-11-07 18:25:23 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [] [] [] - Closing JPA EntityManagerFactory for persistence unit 'default'

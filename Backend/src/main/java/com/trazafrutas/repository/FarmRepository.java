@@ -7,4 +7,5 @@ import java.util.List;
 public interface FarmRepository extends JpaRepository<Farm, Long> {
     List<Farm> findByUserId(Long userId);
     boolean existsByNombreAndUserId(String nombre, Long userId);
+    long countByUserId(Long userId);
 }
