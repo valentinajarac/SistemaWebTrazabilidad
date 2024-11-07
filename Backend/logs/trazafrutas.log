@@ -7936,3 +7936,54 @@ com.trazafrutas.exception.EntityNotFoundException: Remisión no encontrada
 2024-11-07 14:55:39 [http-nio-8080-exec-9] DEBUG c.t.service.RemissionService [08f6107b-5a5b-424c-9a3e-31436b4e01a0] [valen.productor] [0:0:0:0:0:0:0:1] - → Iniciando RemissionService.getRemissionById
 2024-11-07 14:55:39 [http-nio-8080-exec-9] DEBUG c.t.service.RemissionService [08f6107b-5a5b-424c-9a3e-31436b4e01a0] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionService.getRemissionById en 159ms
 2024-11-07 14:55:39 [http-nio-8080-exec-9] DEBUG c.t.controller.RemissionController [08f6107b-5a5b-424c-9a3e-31436b4e01a0] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionController.getRemissionById en 159ms
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 1ms
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 187ms
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 3ms
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG c.t.controller.RemissionController [e799e6d1-f91c-4a52-9a07-a53f2fb4ca98] [valen.productor] [0:0:0:0:0:0:0:1] - → Iniciando RemissionController.getMonthlySummary
+2024-11-07 14:55:53 [http-nio-8080-exec-8] DEBUG c.t.service.RemissionService [e799e6d1-f91c-4a52-9a07-a53f2fb4ca98] [valen.productor] [0:0:0:0:0:0:0:1] - → Iniciando RemissionService.getMonthlySummary
+2024-11-07 14:55:54 [http-nio-8080-exec-8] DEBUG c.t.service.RemissionService [e799e6d1-f91c-4a52-9a07-a53f2fb4ca98] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionService.getMonthlySummary en 193ms
+2024-11-07 14:55:54 [http-nio-8080-exec-8] DEBUG c.t.controller.RemissionController [e799e6d1-f91c-4a52-9a07-a53f2fb4ca98] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionController.getMonthlySummary en 194ms
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.extractUsername
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.extractUsername en 3ms
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.service.CustomUserDetailsService [] [] [] - → Iniciando CustomUserDetailsService.loadUserByUsername
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.service.CustomUserDetailsService [] [] [] - ← Completado CustomUserDetailsService.loadUserByUsername en 47ms
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - → Iniciando JwtService.isTokenValid
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG com.trazafrutas.security.JwtService [] [] [] - ← Completado JwtService.isTokenValid en 2ms
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.controller.RemissionController [e1d01fd4-4d00-449e-bd08-181d966fbfff] [valen.productor] [0:0:0:0:0:0:0:1] - → Iniciando RemissionController.updateRemission
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.service.RemissionService [e1d01fd4-4d00-449e-bd08-181d966fbfff] [valen.productor] [0:0:0:0:0:0:0:1] - → Iniciando RemissionService.getRemissionById
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.service.RemissionService [e1d01fd4-4d00-449e-bd08-181d966fbfff] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionService.getRemissionById en 44ms
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.service.RemissionService [e1d01fd4-4d00-449e-bd08-181d966fbfff] [valen.productor] [0:0:0:0:0:0:0:1] - → Iniciando RemissionService.updateRemission
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.service.RemissionService [e1d01fd4-4d00-449e-bd08-181d966fbfff] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionService.updateRemission en 1ms
+2024-11-07 14:56:24 [http-nio-8080-exec-10] DEBUG c.t.controller.RemissionController [e1d01fd4-4d00-449e-bd08-181d966fbfff] [valen.productor] [0:0:0:0:0:0:0:1] - ← Completado RemissionController.updateRemission en 50ms
+2024-11-07 15:19:41 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [] [] [] - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-11-07 15:19:47 [background-preinit] INFO  o.h.validator.internal.util.Version [] [] [] - HV000001: Hibernate Validator 8.0.1.Final
+2024-11-07 15:19:47 [main] INFO  c.trazafrutas.TrazafrutasApplication [] [] [] - Starting TrazafrutasApplication using Java 17.0.13 with PID 2860 (C:\Users\Usuario\Downloads\SISTEMAWEB DE TRAZABILIDAD\Backend\target\classes started by Usuario in C:\Users\Usuario\Downloads\SISTEMAWEB DE TRAZABILIDAD\Backend)
+2024-11-07 15:19:47 [main] DEBUG c.trazafrutas.TrazafrutasApplication [] [] [] - Running with Spring Boot v3.2.3, Spring v6.1.4
+2024-11-07 15:19:47 [main] INFO  c.trazafrutas.TrazafrutasApplication [] [] [] - No active profile set, falling back to 1 default profile: "default"
+2024-11-07 15:19:49 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate [] [] [] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-11-07 15:19:49 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate [] [] [] - Finished Spring Data repository scanning in 88 ms. Found 5 JPA repository interfaces.
+2024-11-07 15:19:50 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer [] [] [] - Tomcat initialized with port 8080 (http)
+2024-11-07 15:19:50 [main] INFO  o.a.coyote.http11.Http11NioProtocol [] [] [] - Initializing ProtocolHandler ["http-nio-8080"]
+2024-11-07 15:19:50 [main] INFO  o.a.catalina.core.StandardService [] [] [] - Starting service [Tomcat]
+2024-11-07 15:19:50 [main] INFO  o.a.catalina.core.StandardEngine [] [] [] - Starting Servlet engine: [Apache Tomcat/10.1.19]
+2024-11-07 15:19:50 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] [] [] [] - Initializing Spring embedded WebApplicationContext
+2024-11-07 15:19:50 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext [] [] [] - Root WebApplicationContext: initialization completed in 2574 ms
+2024-11-07 15:19:51 [main] INFO  o.h.jpa.internal.util.LogHelper [] [] [] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-11-07 15:19:51 [main] INFO  org.hibernate.Version [] [] [] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2024-11-07 15:19:51 [main] INFO  o.h.c.i.RegionFactoryInitiator [] [] [] - HHH000026: Second-level cache disabled
+2024-11-07 15:19:51 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo [] [] [] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-11-07 15:19:52 [main] WARN  org.hibernate.orm.deprecation [] [] [] - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-11-07 15:19:53 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator [] [] [] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-11-07 15:19:53 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [] [] [] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-11-07 15:19:54 [main] DEBUG com.trazafrutas.filter.MDCFilter [] [] [] - Filter 'MDCFilter' configured for use
+2024-11-07 15:19:54 [main] DEBUG c.t.security.JwtAuthenticationFilter [] [] [] - Filter 'jwtAuthenticationFilter' configured for use
+2024-11-07 15:19:54 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory [] [] [] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-11-07 15:19:55 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration [] [] [] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-11-07 15:19:55 [main] INFO  o.s.s.web.DefaultSecurityFilterChain [] [] [] - Will secure Or [Mvc [pattern='/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@665e0a9b, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@184e7447, org.springframework.security.web.context.SecurityContextHolderFilter@49924fc6, org.springframework.security.web.header.HeaderWriterFilter@3fa695f5, org.springframework.web.filter.CorsFilter@11b74ecb, org.springframework.security.web.authentication.logout.LogoutFilter@3746135b, com.trazafrutas.security.JwtAuthenticationFilter@3e729d46, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@d9ef223, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@a9c923f, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@517e381b, org.springframework.security.web.session.SessionManagementFilter@f542e08, org.springframework.security.web.access.ExceptionTranslationFilter@57a22410, org.springframework.security.web.access.intercept.AuthorizationFilter@1fd2716f]
+2024-11-07 15:19:56 [main] INFO  o.a.coyote.http11.Http11NioProtocol [] [] [] - Starting ProtocolHandler ["http-nio-8080"]
+2024-11-07 15:19:56 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer [] [] [] - Tomcat started on port 8080 (http) with context path ''
+2024-11-07 15:19:56 [main] INFO  c.trazafrutas.TrazafrutasApplication [] [] [] - Started TrazafrutasApplication in 9.433 seconds (process running for 10.04)
+2024-11-07 15:21:23 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean [] [] [] - Closing JPA EntityManagerFactory for persistence unit 'default'

@@ -107,13 +107,15 @@ public class UserService {
             existingUser.setUsuario(updatedUser.getUsuario());
         }
 
-        // Validar y actualizar contraseña
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().trim().isEmpty()) {
-            if (updatedUser.getPassword().length() < 6) {
+        // Validar y actualizar contraseña solo si se proporciona una nueva
+        String newPassword = updatedUser.getPassword();
+        if (newPassword != null && !newPassword.trim().isEmpty()) {
+            if (newPassword.length() < 6) {
                 throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
             }
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            existingUser.setPassword(passwordEncoder.encode(newPassword));
         }
+        // Si no se proporciona contraseña, mantener la existente (no hacer nada)
 
         // Validar y actualizar rol
         if (updatedUser.getRole() != null) {
