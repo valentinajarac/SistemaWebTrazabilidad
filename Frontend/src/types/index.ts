@@ -1,18 +1,12 @@
-// Enums
-export enum Role {
-  ADMIN = 'ADMIN',
-  PRODUCER = 'PRODUCER'
-}
+// Re-exportar todos los tipos
+export * from './auth.types';
+export * from './dashboard.types';
+export * from './producer.types';
 
-export enum ProductType {
-  UCHUVA = 'UCHUVA',
-  GULUPA = 'GULUPA'
-}
-
-export enum CropStatus {
-  PRODUCCION = 'PRODUCCION',
-  VEGETACION = 'VEGETACION'
-}
+// Tipos base
+export type Role = 'ADMIN' | 'PRODUCER';
+export type ProductType = 'UCHUVA' | 'GULUPA';
+export type CropStatus = 'PRODUCCION' | 'VEGETACION';
 
 // Interfaces principales
 export interface User {
@@ -32,7 +26,7 @@ export interface Farm {
   nombre: string;
   hectareas: number;
   municipio: string;
-  userId: number;
+  user?: User;
 }
 
 export interface Crop {
@@ -42,8 +36,10 @@ export interface Crop {
   producto: ProductType;
   estado: CropStatus;
   farmId: number;
-  userId: number;
+  farmNombre: string;  
+  userId?: number;
 }
+
 
 export interface Client {
   id: number;
@@ -62,24 +58,17 @@ export interface Remission {
   kilosPromedio: number;
   totalKilos: number;
   producto: ProductType;
-  userId: number;
-  farmId: number;
-  cropId: number;
-  clientId: number;
+  user?: User;
+  farm: Farm;
+  crop: Crop;
+  client: Client;
 }
 
 // Interfaces para respuestas de la API
-export interface AuthResponse {
-  token: string;
-  role: Role;
-  userId: number;
-  username: string;
-}
-
 export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
   data: T;
-  message?: string;
-  status: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -90,21 +79,13 @@ export interface PaginatedResponse<T> {
   number: number;
 }
 
-// Interfaces para estadísticas
-export interface MonthlyStats {
-  mes: string;
-  kilosUchuva: number;
-  kilosGulupa: number;
+// Interfaces para filtros y búsqueda
+export interface FilterParams {
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  producto?: ProductType;
+  estado?: CropStatus;
+  farmId?: number;
+  clientId?: number;
 }
-
-// Interfaces para formularios
-export interface LoginForm {
-  username: string;
-  password: string;
-}
-
-export interface UserForm extends Omit<User, 'id'> {}
-export interface FarmForm extends Omit<Farm, 'id' | 'userId'> {}
-export interface CropForm extends Omit<Crop, 'id' | 'userId'> {}
-export interface ClientForm extends Omit<Client, 'id'> {}
-export interface RemissionForm extends Omit<Remission, 'id' | 'userId' | 'totalKilos'> {}

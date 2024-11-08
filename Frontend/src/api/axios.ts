@@ -1,38 +1,40 @@
 import axios from 'axios';
-import { API_BASE_URL } from './config';
+import { API_CONFIG } from '../config/constants';
 
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+const api = axios.create({
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: API_CONFIG.TIMEOUT,
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 
-// Interceptor para agregar el token JWT
-axiosInstance.interceptors.request.use(
+// Request interceptor
+api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(API_CONFIG.AUTH.TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
 
-// Interceptor para manejar errores
-axiosInstance.interceptors.response.use(
+// Response interceptor
+api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem(API_CONFIG.AUTH.TOKEN_KEY);
+      localStorage.removeItem(API_CONFIG.AUTH.USER_KEY);
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+export default api;

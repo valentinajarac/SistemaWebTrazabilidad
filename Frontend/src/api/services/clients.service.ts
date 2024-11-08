@@ -1,28 +1,48 @@
 import axios from '../axios';
-import { Client } from '../../types';
+import { Client, ApiResponse } from '../../types';
 
 export const clientService = {
-  async getAll(): Promise<Client[]> {
-    const { data } = await axios.get<Client[]>('/clients');
-    return data;
+  async getAllClients(): Promise<Client[]> {
+    try {
+      const { data } = await axios.get<ApiResponse<Client[]>>('/clients');
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener los clientes');
+    }
   },
 
-  async getById(id: number): Promise<Client> {
-    const { data } = await axios.get<Client>(`/clients/${id}`);
-    return data;
+  async getClientById(id: number): Promise<Client> {
+    try {
+      const { data } = await axios.get<ApiResponse<Client>>(`/clients/${id}`);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener el cliente');
+    }
   },
 
-  async create(client: Omit<Client, 'id'>): Promise<Client> {
-    const { data } = await axios.post<Client>('/clients', client);
-    return data;
+  async createClient(client: Omit<Client, 'id'>): Promise<Client> {
+    try {
+      const { data } = await axios.post<ApiResponse<Client>>('/clients', client);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al crear el cliente');
+    }
   },
 
-  async update(id: number, client: Partial<Client>): Promise<Client> {
-    const { data } = await axios.put<Client>(`/clients/${id}`, client);
-    return data;
+  async updateClient(id: number, client: Partial<Client>): Promise<Client> {
+    try {
+      const { data } = await axios.put<ApiResponse<Client>>(`/clients/${id}`, client);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al actualizar el cliente');
+    }
   },
 
-  async delete(id: number): Promise<void> {
-    await axios.delete(`/clients/${id}`);
+  async deleteClient(id: number): Promise<void> {
+    try {
+      await axios.delete(`/clients/${id}`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al eliminar el cliente');
+    }
   }
 };

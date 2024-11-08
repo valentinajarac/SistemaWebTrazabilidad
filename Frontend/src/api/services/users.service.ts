@@ -2,27 +2,47 @@ import axios from '../axios';
 import { User, ApiResponse } from '../../types';
 
 export const userService = {
-  async getAll(): Promise<User[]> {
-    const { data } = await axios.get<User[]>('/users');
-    return data;
+  async getAllUsers(): Promise<User[]> {
+    try {
+      const { data } = await axios.get<ApiResponse<User[]>>('/users');
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener los usuarios');
+    }
   },
 
-  async getById(id: number): Promise<User> {
-    const { data } = await axios.get<User>(`/users/${id}`);
-    return data;
+  async getUserById(id: number): Promise<User> {
+    try {
+      const { data } = await axios.get<ApiResponse<User>>(`/users/${id}`);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener el usuario');
+    }
   },
 
-  async create(user: Omit<User, 'id'>): Promise<User> {
-    const { data } = await axios.post<User>('/users', user);
-    return data;
+  async createUser(user: Omit<User, 'id'>): Promise<User> {
+    try {
+      const { data } = await axios.post<ApiResponse<User>>('/users', user);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al crear el usuario');
+    }
   },
 
-  async update(id: number, user: Partial<User>): Promise<User> {
-    const { data } = await axios.put<User>(`/users/${id}`, user);
-    return data;
+  async updateUser(id: number, user: Partial<User>): Promise<User> {
+    try {
+      const { data } = await axios.put<ApiResponse<User>>(`/users/${id}`, user);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al actualizar el usuario');
+    }
   },
 
-  async delete(id: number): Promise<void> {
-    await axios.delete(`/users/${id}`);
+  async deleteUser(id: number): Promise<void> {
+    try {
+      await axios.delete(`/users/${id}`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al eliminar el usuario');
+    }
   }
 };

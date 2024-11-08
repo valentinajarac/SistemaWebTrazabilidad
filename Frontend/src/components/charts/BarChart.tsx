@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface BarChartProps {
@@ -24,16 +24,24 @@ interface BarChartProps {
 }
 
 export function BarChart({ data, xAxisKey, bars, height = 400 }: BarChartProps) {
+  // Ordenar los datos por fecha
+  const sortedData = [...data].sort((a, b) => {
+    const dateA = new Date(a[xAxisKey]);
+    const dateB = new Date(b[xAxisKey]);
+    return dateA.getTime() - dateB.getTime();
+  });
+
   return (
     <div style={{ width: '100%', height }}>
       <ResponsiveContainer>
-        <RechartsBarChart data={data}>
+        <RechartsBarChart data={sortedData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey={xAxisKey}
             tickFormatter={(value) => {
-              if (value instanceof Date || !isNaN(Date.parse(value))) {
-                return format(new Date(value), 'MMM yyyy', { locale: es });
+              if (typeof value === 'string') {
+                const date = parseISO(value);
+                return format(date, 'MMM yyyy', { locale: es });
               }
               return value;
             }}
@@ -41,8 +49,9 @@ export function BarChart({ data, xAxisKey, bars, height = 400 }: BarChartProps) 
           <YAxis />
           <Tooltip
             labelFormatter={(value) => {
-              if (value instanceof Date || !isNaN(Date.parse(value))) {
-                return format(new Date(value), 'MMMM yyyy', { locale: es });
+              if (typeof value === 'string') {
+                const date = parseISO(value);
+                return format(date, 'MMMM yyyy', { locale: es });
               }
               return value;
             }}

@@ -18,9 +18,10 @@ function Sidebar() {
 
   return (
     <div className="bg-gray-900 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out">
-      <div className="flex items-center justify-center space-x-2 px-4">
-        <Trees className="h-8 w-8" />
-        <span className="text-2xl font-bold">Trazafrutas</span>
+      {/* Logo container with white background */}
+      <div className="flex items-center justify-center space-x-2 px-4 bg-white bg-opacity-100 py-4 rounded-b-lg">
+        <Trees className="h-8 w-8 text-gray-900" />
+        <span className="text-2xl font-bold text-gray-900">Trazafrutas</span>
       </div>
       
       <nav className="space-y-2">

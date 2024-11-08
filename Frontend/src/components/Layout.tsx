@@ -36,23 +36,11 @@ export function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <main className="flex-1 overflow-auto">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex items-center justify-between mb-8">
-            <img 
-              src="/logo.svg" 
-              alt="TrazaFrutas Logo" 
-              className="h-16 w-auto"
-            />
-          </div>
-          {children}
-        </div>
-      </main>
-
-      {/* Barra lateral derecha */}
-      <aside className="w-64 bg-gray-900">
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Barra lateral izquierda */}
+      <aside className="w-64 bg-gray-900 text-white">
         <div className="flex flex-col h-full">
+          {/* Logo */}
           <div className="flex items-center justify-center h-32 bg-gray-800 p-4">
             <img 
               src="/logo.svg" 
@@ -60,15 +48,17 @@ export function Layout({ children }: LayoutProps) {
               className="h-24 w-auto"
             />
           </div>
-          <nav className="flex-1 px-2 py-4 space-y-2">
+
+          {/* Menú de navegación */}
+          <nav className="flex-1 px-4 py-6 space-y-2">
             {menuItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex items-center w-full px-4 py-2 text-sm rounded-lg ${
+                className={`flex items-center w-full px-4 py-3 text-sm rounded-lg transition-colors ${
                   location.pathname === item.path
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-300 hover:bg-gray-800'
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }`}
               >
                 <item.icon className="w-5 h-5 mr-3" />
@@ -76,10 +66,12 @@ export function Layout({ children }: LayoutProps) {
               </button>
             ))}
           </nav>
-          <div className="p-4">
+
+          {/* Botón de cerrar sesión */}
+          <div className="p-4 border-t border-gray-800">
             <button
               onClick={handleLogout}
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-300 rounded-lg hover:bg-gray-800"
+              className="flex items-center w-full px-4 py-3 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
             >
               <LogOut className="w-5 h-5 mr-3" />
               Cerrar Sesión
@@ -87,6 +79,13 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </aside>
+
+      {/* Contenido principal */}
+      <main className="flex-1 overflow-auto">
+        <div className="container mx-auto px-6 py-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

@@ -1,94 +1,225 @@
-import React, { useState } from 'react';
-import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
-import { Remission } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { PlusCircle } from 'lucide-react';
+import { Remission, Farm, Crop, Client } from '../../types';
+import { DataTable } from '../../components/DataTable';
+import { Modal } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
+import { Alert } from '../../components/ui/Alert';
+import { RemissionForm } from '../../components/forms/RemissionForm';
+import api from '../../api/config';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export function Remissions() {
   const [remissions, setRemissions] = useState<Remission[]>([]);
+  const [farms, setFarms] = useState<Farm[]>([]);
+  const [crops, setCrops] = useState<Crop[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRemission, setCurrentRemission] = useState<Remission | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (remission: Remission) => {
-    const totalKilos = remission.canastillasEnviadas * remission.kilosPromedio;
-    const newRemission = { ...remission, totalKilos };
+  useEffect(() => {
+    fetchRemissions();
+    fetchFarms();
+    fetchCrops();
+    fetchClients();
+  }, []);
 
-    if (currentRemission) {
-      setRemissions(remissions.map(r => r.id === currentRemission.id ? newRemission : r));
-    } else {
-      setRemissions([...remissions, { ...newRemission, id: Date.now().toString() }]);
+  const fetchRemissions = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/remissions');
+      if (response.data.success) {
+        // Transformar los datos para asegurar que las relaciones estén correctamente mapeadas
+        const transformedRemissions = response.data.data.map((remission: any) => ({
+          ...remission,
+          farm: farms.find(f => f.id === remission.farmId) || { nombre: 'N/A' },
+          client: clients.find(c => c.id === remission.clientId) || { nombre: 'N/A' }
+        }));
+        setRemissions(transformedRemissions);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'Error al cargar las remisiones');
+    } finally {
+      setLoading(false);
     }
-    setIsModalOpen(false);
-    setCurrentRemission(null);
   };
 
+  const fetchFarms = async () => {
+    try {
+      const response = await api.get('/farms');
+      if (response.data.success) {
+        setFarms(response.data.data);
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'Error al cargar las fincas');
+    }
+  };
+
+  const fetchCrops = async () => {
+    try {
+      const response = await api.get('/crops');
+      if (response.data.success) {
+        setCrops(response.data.data);
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'Error al cargar los cultivos');
+    }
+  };
+
+  const fetchClients = async () => {
+    try {
+      const response = await api.get('/clients');
+      if (response.data.success) {
+        setClients(response.data.data);
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'Error al cargar los clientes');
+    }
+  };
+
+  // Refrescar los datos cuando se carguen las fincas y clientes
+  useEffect(() => {
+    if (farms.length > 0 && clients.length > 0) {
+      fetchRemissions();
+    }
+  }, [farms, clients]);
+
+  const handleSubmit = async (data: Omit<Remission, 'id'>) => {
+    try {
+      setLoading(true);
+      const url = currentRemission ? `/remissions/${currentRemission.id}` : '/remissions';
+      const method = currentRemission ? 'put' : 'post';
+      
+      const response = await api[method](url, data);
+      
+      if (response.data.success) {
+        await fetchRemissions();
+        setIsModalOpen(false);
+        setCurrentRemission(null);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'Error al guardar la remisión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (remission: Remission) => {
+    setCurrentRemission(remission);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (remission: Remission) => {
+    if (window.confirm('¿Está seguro de eliminar esta remisión?')) {
+      try {
+        setLoading(true);
+        const response = await api.delete(`/remissions/${remission.id}`);
+        
+        if (response.data.success) {
+          await fetchRemissions();
+        } else {
+          setError(response.data.message);
+        }
+      } catch (error: any) {
+        setError(error.response?.data?.message || 'Error al eliminar la remisión');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const columns = [
+    { 
+      key: 'fechaDespacho', 
+      label: 'Fecha',
+      render: (value: string) => format(new Date(value), 'dd/MM/yyyy', { locale: es })
+    },
+    { 
+      key: 'farm.nombre', 
+      label: 'Finca'
+    },
+    { 
+      key: 'producto', 
+      label: 'Producto',
+      render: (value: string) => value?.charAt(0) + value?.slice(1).toLowerCase() || 'N/A'
+    },
+    { 
+      key: 'canastillasEnviadas', 
+      label: 'Canastillas',
+      render: (value: number) => value?.toLocaleString() || '0'
+    },
+    { 
+      key: 'kilosPromedio', 
+      label: 'Kilos Promedio',
+      render: (value: number) => value?.toFixed(2) || '0.00'
+    },
+    { 
+      key: 'totalKilos', 
+      label: 'Total Kilos',
+      render: (value: number) => value?.toFixed(2) || '0.00'
+    },
+    { 
+      key: 'client.nombre', 
+      label: 'Cliente'
+    }
+  ];
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Remisiones de Campo</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        <Button
+          onClick={() => {
+            setCurrentRemission(null);
+            setIsModalOpen(true);
+          }}
+          variant="primary"
+          icon={PlusCircle}
+          disabled={loading}
         >
-          <PlusCircle className="w-5 h-5 mr-2" />
           Nueva Remisión
-        </button>
+        </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Fecha
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Producto
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Canastillas
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Kilos Promedio
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Total Kilos
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {remissions.map((remission) => (
-              <tr key={remission.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {new Date(remission.fechaDespacho).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap capitalize">{remission.producto}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{remission.canastillasEnviadas}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{remission.kilosPromedio}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{remission.totalKilos}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <button
-                    onClick={() => {
-                      setCurrentRemission(remission);
-                      setIsModalOpen(true);
-                    }}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
-                  >
-                    <Edit2 className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setRemissions(remissions.filter(r => r.id !== remission.id))}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {error && (
+        <Alert
+          type="error"
+          message={error}
+          onClose={() => setError(null)}
+        />
+      )}
+
+      <DataTable
+        columns={columns}
+        data={remissions}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        loading={loading}
+      />
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={currentRemission ? 'Editar Remisión' : 'Nueva Remisión'}
+      >
+        <RemissionForm
+          onSubmit={handleSubmit}
+          initialData={currentRemission}
+          farms={farms}
+          crops={crops}
+          clients={clients}
+          onClose={() => setIsModalOpen(false)}
+          loading={loading}
+        />
+      </Modal>
     </div>
   );
 }
+

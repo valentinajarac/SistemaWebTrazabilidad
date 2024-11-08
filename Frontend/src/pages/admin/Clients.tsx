@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Client } from '../../types';
 import { DataTable } from '../../components/DataTable';
+import { Alert } from '../../components/ui/Alert';
+import { Button } from '../../components/ui/Button';
 import { Plus, X } from 'lucide-react';
+import api from '../../api/config';
 
 export const Clients: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Client>();
 
@@ -17,36 +22,46 @@ export const Clients: React.FC = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/clients');
-      const data = await response.json();
-      setClients(data);
-    } catch (error) {
+      setLoading(true);
+      setError(null);
+      const response = await api.get('/clients');
+      
+      if (response.data.success) {
+        setClients(response.data.data);
+      } else {
+        setError(response.data.message || 'Error al cargar los clientes');
+      }
+    } catch (error: any) {
       console.error('Error al cargar clientes:', error);
+      setError(error.response?.data?.message || 'Error al cargar los clientes');
+    } finally {
+      setLoading(false);
     }
   };
 
   const onSubmit = async (data: Client) => {
     try {
-      const url = editingClient 
-        ? `http://localhost:8080/api/clients/${editingClient.id}`
-        : 'http://localhost:8080/api/clients';
-        
-      const method = editingClient ? 'PUT' : 'POST';
+      setLoading(true);
+      setError(null);
       
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      const url = editingClient ? `/clients/${editingClient.id}` : '/clients';
+      const method = editingClient ? 'put' : 'post';
+      
+      const response = await api[method](url, data);
 
-      if (response.ok) {
-        fetchClients();
+      if (response.data.success) {
+        await fetchClients();
         setShowModal(false);
         reset();
         setEditingClient(null);
+      } else {
+        setError(response.data.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al guardar cliente:', error);
+      setError(error.response?.data?.message || 'Error al guardar el cliente');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,12 +74,21 @@ export const Clients: React.FC = () => {
   const handleDelete = async (client: Client) => {
     if (window.confirm('¿Está seguro de eliminar este cliente?')) {
       try {
-        await fetch(`http://localhost:8080/api/clients/${client.id}`, {
-          method: 'DELETE',
-        });
-        fetchClients();
-      } catch (error) {
+        setLoading(true);
+        setError(null);
+        
+        const response = await api.delete(`/clients/${client.id}`);
+        
+        if (response.data.success) {
+          await fetchClients();
+        } else {
+          setError(response.data.message);
+        }
+      } catch (error: any) {
         console.error('Error al eliminar cliente:', error);
+        setError(error.response?.data?.message || 'Error al eliminar el cliente');
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -81,35 +105,48 @@ export const Clients: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Gestión de Clientes</h1>
-        <button
+        <h1 className="text-2xl font-bold text-gray-800">Gestión de Clientes</h1>
+        <Button
           onClick={() => {
             setEditingClient(null);
             reset({});
             setShowModal(true);
           }}
-          className="bg-green-500 text-white px-4 py-2 rounded flex items-center"
+          variant="primary"
+          icon={Plus}
+          disabled={loading}
         >
-          <Plus className="w-4 h-4 mr-2" />
           Nuevo Cliente
-        </button>
+        </Button>
       </div>
+
+      {error && (
+        <Alert
+          type="error"
+          message={error}
+          onClose={() => setError(null)}
+        />
+      )}
 
       <DataTable
         columns={columns}
         data={clients}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        loading={loading}
       />
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
                 {editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}
               </h2>
-              <button onClick={() => setShowModal(false)}>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -118,55 +155,78 @@ export const Clients: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">NIT</label>
                 <input
-                  type="number"
-                  {...register('nit', { required: true })}
+                  type="text"
+                  {...register('nit', { required: 'El NIT es requerido' })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                  disabled={loading}
                 />
-                {errors.nit && <span className="text-red-500 text-sm">Campo requerido</span>}
+                {errors.nit && (
+                  <span className="text-red-500 text-sm">{errors.nit.message}</span>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Nombre</label>
                 <input
                   type="text"
-                  {...register('nombre', { required: true })}
+                  {...register('nombre', { required: 'El nombre es requerido' })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                  disabled={loading}
                 />
-                {errors.nombre && <span className="text-red-500 text-sm">Campo requerido</span>}
+                {errors.nombre && (
+                  <span className="text-red-500 text-sm">{errors.nombre.message}</span>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">FLO ID</label>
                 <input
-                  type="number"
+                  type="text"
                   {...register('floid', { 
-                    required: true,
-                    minLength: 4,
-                    maxLength: 4
+                    required: 'El FLO ID es requerido',
+                    pattern: {
+                      value: /^\d{4}$/,
+                      message: 'El FLO ID debe ser un número de 4 dígitos'
+                    }
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                  disabled={loading}
                 />
-                {errors.floid && <span className="text-red-500 text-sm">Debe ser un número de 4 dígitos</span>}
+                {errors.floid && (
+                  <span className="text-red-500 text-sm">{errors.floid.message}</span>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Dirección</label>
                 <input
                   type="text"
-                  {...register('direccion', { required: true })}
+                  {...register('direccion', { required: 'La dirección es requerida' })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                  disabled={loading}
                 />
-                {errors.direccion && <span className="text-red-500 text-sm">Campo requerido</span>}
+                {errors.direccion && (
+                  <span className="text-red-500 text-sm">{errors.direccion.message}</span>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Teléfono</label>
                 <input
                   type="text"
-                  {...register('telefono', { required: true })}
+                  {...register('telefono', { 
+                    required: 'El teléfono es requerido',
+                    pattern: {
+                      value: /^\d{7,10}$/,
+                      message: 'El teléfono debe tener entre 7 y 10 dígitos'
+                    }
+                  })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                  disabled={loading}
                 />
-                {errors.telefono && <span className="text-red-500 text-sm">Campo requerido</span>}
+                {errors.telefono && (
+                  <span className="text-red-500 text-sm">{errors.telefono.message}</span>
+                )}
               </div>
 
               <div>
@@ -174,20 +234,28 @@ export const Clients: React.FC = () => {
                 <input
                   type="email"
                   {...register('email', { 
-                    required: true,
-                    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+                    required: 'El email es requerido',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Email inválido'
+                    }
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                  disabled={loading}
                 />
-                {errors.email && <span className="text-red-500 text-sm">Email inválido</span>}
+                {errors.email && (
+                  <span className="text-red-500 text-sm">{errors.email.message}</span>
+                )}
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors"
+                variant="primary"
+                fullWidth
+                loading={loading}
               >
                 {editingClient ? 'Actualizar' : 'Crear'} Cliente
-              </button>
+              </Button>
             </form>
           </div>
         </div>

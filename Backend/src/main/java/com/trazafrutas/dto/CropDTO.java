@@ -12,7 +12,8 @@ public class CropDTO {
     private Double hectareas;
     private ProductType producto;
     private CropStatus estado;
-    private FarmDTO farm;
+    private Long farmId;
+    private String farmNombre;  // Añadido para mostrar el nombre de la finca
     private Long userId;
 
     public static CropDTO fromEntity(Crop crop) {
@@ -22,8 +23,17 @@ public class CropDTO {
         dto.setHectareas(crop.getHectareas());
         dto.setProducto(crop.getProducto());
         dto.setEstado(crop.getEstado());
-        dto.setFarm(FarmDTO.fromEntity(crop.getFarm()));
-        dto.setUserId(crop.getUser().getId());
+
+        // Asegurarnos de incluir la información de la finca
+        if (crop.getFarm() != null) {
+            dto.setFarmId(crop.getFarm().getId());
+            dto.setFarmNombre(crop.getFarm().getNombre());
+        }
+
+        if (crop.getUser() != null) {
+            dto.setUserId(crop.getUser().getId());
+        }
+
         return dto;
     }
 }

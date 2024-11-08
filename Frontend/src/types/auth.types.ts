@@ -1,17 +1,21 @@
-export interface AuthResponse {
-  token: string;
-  refreshToken?: string;
-  role: Role;
-  userId: number;
-  username: string;
-}
-
-export interface LoginForm {
+// Tipos de autenticación
+export interface AuthRequest {
   username: string;
   password: string;
 }
 
-export interface RefreshTokenResponse {
+export interface AuthResponse {
   token: string;
-  refreshToken: string;
+  role: 'ADMIN' | 'PRODUCER';
+  userId: number;
+  username: string;
 }
+
+// Tipos de respuesta de la API
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+export interface LoginResponse extends ApiResponse<AuthResponse> {}

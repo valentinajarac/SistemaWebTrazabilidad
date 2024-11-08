@@ -1,33 +1,57 @@
 import axios from '../axios';
-import { Remission, MonthlyStats } from '../../types';
+import { Remission, MonthlyStats, ApiResponse } from '../../types';
 
 export const remissionService = {
-  async getByUserId(userId: number): Promise<Remission[]> {
-    const { data } = await axios.get<Remission[]>(`/remissions/user/${userId}`);
-    return data;
+  async getMyRemissions(): Promise<Remission[]> {
+    try {
+      const { data } = await axios.get<ApiResponse<Remission[]>>('/remissions');
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener las remisiones');
+    }
   },
 
-  async getById(id: number): Promise<Remission> {
-    const { data } = await axios.get<Remission>(`/remissions/${id}`);
-    return data;
+  async getRemissionById(id: number): Promise<Remission> {
+    try {
+      const { data } = await axios.get<ApiResponse<Remission>>(`/remissions/${id}`);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener la remisión');
+    }
   },
 
-  async create(remission: Omit<Remission, 'id' | 'totalKilos'>): Promise<Remission> {
-    const { data } = await axios.post<Remission>('/remissions', remission);
-    return data;
+  async createRemission(remission: Omit<Remission, 'id'>): Promise<Remission> {
+    try {
+      const { data } = await axios.post<ApiResponse<Remission>>('/remissions', remission);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al crear la remisión');
+    }
   },
 
-  async update(id: number, remission: Partial<Remission>): Promise<Remission> {
-    const { data } = await axios.put<Remission>(`/remissions/${id}`, remission);
-    return data;
+  async updateRemission(id: number, remission: Partial<Remission>): Promise<Remission> {
+    try {
+      const { data } = await axios.put<ApiResponse<Remission>>(`/remissions/${id}`, remission);
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al actualizar la remisión');
+    }
   },
 
-  async delete(id: number): Promise<void> {
-    await axios.delete(`/remissions/${id}`);
+  async deleteRemission(id: number): Promise<void> {
+    try {
+      await axios.delete(`/remissions/${id}`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al eliminar la remisión');
+    }
   },
 
   async getMonthlySummary(): Promise<MonthlyStats[]> {
-    const { data } = await axios.get<MonthlyStats[]>('/remissions/monthly-summary');
-    return data;
+    try {
+      const { data } = await axios.get<ApiResponse<MonthlyStats[]>>('/remissions/monthly-summary');
+      return data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al obtener el resumen mensual');
+    }
   }
 };

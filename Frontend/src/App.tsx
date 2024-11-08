@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ConfirmProvider } from './context/ConfirmContext';
 import { AppRoutes } from './routes';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <LoadingProvider>
@@ -20,4 +20,6 @@ function App() {
       </LoadingProvider>
     </Router>
   );
-}
+};
+
+export default App;

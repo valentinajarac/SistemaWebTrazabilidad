@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../api/services/auth.service';
 import { useLoading } from './LoadingContext';
 import { useError } from './ErrorContext';
-import { User, Role, AuthResponse } from '../types';
+import { AuthResponse } from '../types';
+import { API_CONFIG } from '../config/constants';
 
 interface AuthContextType {
   user: AuthResponse | null;
@@ -16,24 +17,32 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthResponse | null>(null);
+  // Inicializar el estado del usuario con los datos almacenados
+  const [user, setUser] = useState<AuthResponse | null>(() => {
+    try {
+      const savedUser = localStorage.getItem(API_CONFIG.AUTH.USER_KEY);
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      localStorage.removeItem(API_CONFIG.AUTH.USER_KEY);
+      return null;
+    }
+  });
+
   const { setLoading } = useLoading();
   const { setError } = useError();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-  }, []);
 
   const login = async (username: string, password: string) => {
     try {
       setLoading(true);
       const response = await authService.login({ username, password });
+      
+      // Guardar el usuario en el estado y localStorage
       setUser(response);
-      navigate(response.role === Role.ADMIN ? '/admin' : '/producer');
+      localStorage.setItem(API_CONFIG.AUTH.USER_KEY, JSON.stringify(response));
+
+      // Redirigir según el rol
+      navigate(response.role === 'ADMIN' ? '/admin' : '/producer');
     } catch (error: any) {
       setError(error.message || 'Error al iniciar sesión');
       throw error;
@@ -55,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         isAuthenticated: !!user,
-        isAdmin: user?.role === Role.ADMIN,
+        isAdmin: user?.role === 'ADMIN'
       }}
     >
       {children}

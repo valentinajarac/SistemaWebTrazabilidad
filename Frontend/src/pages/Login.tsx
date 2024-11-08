@@ -1,22 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/ui/Button';
+import { FormField } from '../components/forms/FormField';
+import { Alert } from '../components/ui/Alert';
+import { LogIn } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [error, setError] = React.useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
+    setLoading(true);
+    setError(null);
 
     try {
-      await login(username, password);
-    } catch (error) {
-      setError('Usuario o contraseña incorrectos');
+      await login(formData.username, formData.password);
+    } catch (err: any) {
+      setError(err.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,51 +47,50 @@ export const Login: React.FC = () => {
           />
         </div>
         
-        <h2 className="text-2xl font-bold text-center mb-6">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Sistema de Trazabilidad de Frutas
         </h2>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
+          <Alert
+            type="error"
+            message={error}
+            onClose={() => setError(null)}
+          />
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-              Usuario
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
-              required
-            />
-          </div>
+          <FormField
+            label="Usuario"
+            name="username"
+            type="text"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
 
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
-              required
-            />
-          </div>
+          <FormField
+            label="Contraseña"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
 
-          <button
+          <Button
             type="submit"
-            className="w-full bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600 transition-colors"
+            variant="primary"
+            fullWidth
+            loading={loading}
+            icon={LogIn}
           >
             Iniciar Sesión
-          </button>
+          </Button>
         </form>
       </div>
     </div>
   );
-}
+};
