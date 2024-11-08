@@ -85,7 +85,7 @@ export function ProducerDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Mi Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Pagina Principal Productor</h1>
         <div className="flex gap-2">
           <Button
             onClick={handleExportExcel}

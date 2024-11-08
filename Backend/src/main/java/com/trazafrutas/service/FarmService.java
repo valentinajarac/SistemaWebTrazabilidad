@@ -14,15 +14,44 @@ import java.util.List;
 public class FarmService {
     private final FarmRepository farmRepository;
 
+    /**
+     * Obtiene todas las fincas (para administradores).
+     *
+     * @return Lista de todas las fincas
+     */
+    public List<Farm> getAllFarms() {
+        return farmRepository.findAll();
+    }
+
+    /**
+     * Obtiene todas las fincas de un usuario específico.
+     *
+     * @param userId ID del usuario
+     * @return Lista de fincas asociadas al usuario
+     */
     public List<Farm> getFarmsByUserId(Long userId) {
         return farmRepository.findByUserId(userId);
     }
 
+    /**
+     * Obtiene una finca por su ID.
+     *
+     * @param id ID de la finca
+     * @return La finca encontrada
+     * @throws EntityNotFoundException si la finca no existe
+     */
     public Farm getFarmById(Long id) {
         return farmRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Finca no encontrada con ID: " + id));
     }
 
+    /**
+     * Crea una nueva finca.
+     *
+     * @param farm La finca a crear
+     * @return La finca creada
+     * @throws IllegalArgumentException si los datos de la finca no son válidos
+     */
     @Transactional
     public Farm createFarm(Farm farm) {
         validateFarmData(farm);
@@ -35,6 +64,14 @@ public class FarmService {
         return farmRepository.save(farm);
     }
 
+    /**
+     * Actualiza una finca existente.
+     *
+     * @param id           ID de la finca a actualizar
+     * @param updatedFarm  Datos actualizados de la finca
+     * @return La finca actualizada
+     * @throws IllegalArgumentException si los datos de la finca no son válidos
+     */
     @Transactional
     public Farm updateFarm(Long id, Farm updatedFarm) {
         Farm existingFarm = getFarmById(id);
@@ -64,6 +101,12 @@ public class FarmService {
         return farmRepository.save(existingFarm);
     }
 
+    /**
+     * Elimina una finca por su ID.
+     *
+     * @param id ID de la finca a eliminar
+     * @throws EntityNotFoundException si la finca no existe
+     */
     @Transactional
     public void deleteFarm(Long id) {
         if (!farmRepository.existsById(id)) {
@@ -72,6 +115,12 @@ public class FarmService {
         farmRepository.deleteById(id);
     }
 
+    /**
+     * Valida los datos de una finca.
+     *
+     * @param farm La finca a validar
+     * @throws IllegalArgumentException si los datos no son válidos
+     */
     private void validateFarmData(Farm farm) {
         StringBuilder errors = new StringBuilder();
 

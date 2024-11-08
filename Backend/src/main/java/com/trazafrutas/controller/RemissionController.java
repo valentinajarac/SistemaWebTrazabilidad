@@ -20,19 +20,8 @@ import java.util.stream.Collectors;
 public class RemissionController {
     private final RemissionService remissionService;
 
-    private ResponseEntity<?> checkProducerRole(User user) {
-        if (user.getRole() != Role.PRODUCER) {
-            return ResponseEntity.status(403)
-                    .body(new ApiResponse(false, "Solo los productores pueden gestionar remisiones"));
-        }
-        return null;
-    }
-
     @GetMapping
     public ResponseEntity<?> getMyRemissions(@AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
             List<Remission> remissions = remissionService.getRemissionsByUserId(user.getId());
             List<RemissionDTO> remissionDTOs = remissions.stream()
@@ -47,12 +36,9 @@ public class RemissionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getRemissionById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
             Remission remission = remissionService.getRemissionById(id);
-            if (!remission.getUser().getId().equals(user.getId())) {
+            if (!remission.getUser().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "No tiene permiso para ver esta remisión"));
             }
@@ -65,10 +51,11 @@ public class RemissionController {
 
     @PostMapping
     public ResponseEntity<?> createRemission(@RequestBody Remission remission, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            if (user.getRole() != Role.PRODUCER) {
+                return ResponseEntity.status(403)
+                        .body(new ApiResponse(false, "Solo los productores pueden crear remisiones"));
+            }
             remission.setUser(user);
             Remission newRemission = remissionService.createRemission(remission);
             return ResponseEntity.ok(new ApiResponse(true, "Remisión creada exitosamente", RemissionDTO.fromEntity(newRemission)));
@@ -86,10 +73,12 @@ public class RemissionController {
             @PathVariable Long id,
             @RequestBody Remission remission,
             @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            if (user.getRole() != Role.PRODUCER) {
+                return ResponseEntity.status(403)
+                        .body(new ApiResponse(false, "Solo los productores pueden modificar remisiones"));
+            }
+
             Remission existingRemission = remissionService.getRemissionById(id);
             if (!existingRemission.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
@@ -110,10 +99,12 @@ public class RemissionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRemission(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            if (user.getRole() != Role.PRODUCER) {
+                return ResponseEntity.status(403)
+                        .body(new ApiResponse(false, "Solo los productores pueden eliminar remisiones"));
+            }
+
             Remission remission = remissionService.getRemissionById(id);
             if (!remission.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
@@ -128,17 +119,23 @@ public class RemissionController {
         }
     }
 
-    @GetMapping("/monthly-summary")
-    public ResponseEntity<?> getMonthlySummary(@AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
+    @GetMapping("/admin")
+    public ResponseEntity<?> getAllRemissions(@AuthenticationPrincipal User user) {
         try {
-            var monthlyStats = remissionService.getMonthlySummary(user.getId());
-            return ResponseEntity.ok(new ApiResponse(true, "Resumen mensual obtenido exitosamente", monthlyStats));
+            if (user.getRole() != Role.ADMIN) {
+                return ResponseEntity.status(403)
+                        .body(new ApiResponse(false, "Solo los administradores pueden ver todas las remisiones"));
+            }
+
+            List<Remission> remissions = remissionService.getAllRemissions();
+            List<RemissionDTO> remissionDTOs = remissions.stream()
+                    .map(RemissionDTO::fromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new ApiResponse(true, "Remisiones obtenidas exitosamente", remissionDTOs));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body(new ApiResponse(false, "Error al obtener el resumen mensual: " + e.getMessage()));
+                    .body(new ApiResponse(false, "Error al obtener las remisiones: " + e.getMessage()));
         }
     }
 }
+

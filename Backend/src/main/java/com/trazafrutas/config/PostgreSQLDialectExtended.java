@@ -2,7 +2,6 @@ package com.trazafrutas.config;
 
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.boot.model.FunctionContributions;
-import org.hibernate.query.sqm.function.SqmFunctionDescriptor;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.spi.TypeConfiguration;
 
@@ -14,45 +13,39 @@ public class PostgreSQLDialectExtended extends PostgreSQLDialect {
 
         TypeConfiguration typeConfiguration = functionContributions.getTypeConfiguration();
 
-        // Registrar función date_trunc
+        // Registrar función DATE_TRUNC
         functionContributions.getFunctionRegistry().registerPattern(
-                "date_trunc",
+                "DATE_TRUNC",
                 "date_trunc(?1, ?2)",
                 typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.TIMESTAMP)
         );
 
-        // Registrar función para intervalos
+        // Registrar función para restar meses
         functionContributions.getFunctionRegistry().registerPattern(
-                "subtract_months",
+                "SUBTRACT_MONTHS",
                 "?1 - interval '?2 month'",
                 typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.TIMESTAMP)
         );
 
-        // Registrar funciones de extracción de fecha
+        // Registrar función YEAR
         functionContributions.getFunctionRegistry().registerPattern(
-                "year",
+                "YEAR",
                 "extract(year from ?1)",
                 typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.INTEGER)
         );
 
+        // Registrar función MONTH
         functionContributions.getFunctionRegistry().registerPattern(
-                "month",
+                "MONTH",
                 "extract(month from ?1)",
                 typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.INTEGER)
         );
 
-        // Registrar función para el primer día del mes
+        // Registrar función CURRENT_DATE
         functionContributions.getFunctionRegistry().registerPattern(
-                "first_day_of_month",
-                "date_trunc('month', ?1)",
-                typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.TIMESTAMP)
-        );
-
-        // Registrar función para el último día del mes
-        functionContributions.getFunctionRegistry().registerPattern(
-                "last_day_of_month",
-                "(date_trunc('month', ?1) + interval '1 month' - interval '1 day')",
-                typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.TIMESTAMP)
+                "CURRENT_DATE",
+                "CURRENT_DATE",
+                typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.DATE)
         );
     }
 }

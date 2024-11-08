@@ -22,7 +22,10 @@ export function Layout({ children }: LayoutProps) {
   const menuItems = isAdmin ? [
     { icon: Home, label: 'Dashboard', path: '/admin' },
     { icon: Users, label: 'Usuarios', path: '/admin/users' },
-    { icon: Users, label: 'Clientes', path: '/admin/clients' }
+    { icon: Users, label: 'Clientes', path: '/admin/clients' },
+    { icon: ClipboardList, label: 'Remisiones', path: '/admin/remissions' },
+    { icon: Warehouse, label: 'Fincas', path: '/admin/farms' },
+    { icon: Sprout, label: 'Cultivos', path: '/admin/crops' }
   ] : [
     { icon: Home, label: 'Dashboard', path: '/producer' },
     { icon: Warehouse, label: 'Fincas', path: '/producer/farms' },

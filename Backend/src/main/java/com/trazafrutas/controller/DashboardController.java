@@ -1,6 +1,7 @@
 package com.trazafrutas.controller;
 
 import com.trazafrutas.dto.ApiResponse;
+import com.trazafrutas.dto.DashboardStats;
 import com.trazafrutas.model.User;
 import com.trazafrutas.model.enums.Role;
 import com.trazafrutas.service.DashboardService;
@@ -8,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -25,7 +24,7 @@ public class DashboardController {
                         .body(new ApiResponse(false, "Solo los administradores pueden ver estas estadísticas"));
             }
 
-            Map<String, Object> stats = dashboardService.getAdminStats();
+            DashboardStats stats = dashboardService.getAdminStats();
             return ResponseEntity.ok(new ApiResponse(true, "Estadísticas obtenidas exitosamente", stats));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

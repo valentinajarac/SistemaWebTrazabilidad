@@ -13,28 +13,28 @@ public interface RemissionRepository extends JpaRepository<Remission, Long> {
 
     @Query("""
         SELECT new com.trazafrutas.dto.MonthlyStats(
-            r.fechaDespacho,
+            date_trunc('month', r.fechaDespacho),
             SUM(CASE WHEN r.producto = 'UCHUVA' THEN r.totalKilos ELSE 0 END),
             SUM(CASE WHEN r.producto = 'GULUPA' THEN r.totalKilos ELSE 0 END)
         )
         FROM Remission r
-        WHERE r.fechaDespacho >= first_day_of_month(subtract_months(CURRENT_TIMESTAMP, 11))
-        GROUP BY year(r.fechaDespacho), month(r.fechaDespacho), r.fechaDespacho
-        ORDER BY r.fechaDespacho DESC
+        WHERE r.fechaDespacho >= subtract_months(CURRENT_DATE, 11)
+        GROUP BY date_trunc('month', r.fechaDespacho)
+        ORDER BY date_trunc('month', r.fechaDespacho) DESC
     """)
     List<MonthlyStats> getMonthlySummary();
 
     @Query("""
         SELECT new com.trazafrutas.dto.MonthlyStats(
-            r.fechaDespacho,
+            date_trunc('month', r.fechaDespacho),
             SUM(CASE WHEN r.producto = 'UCHUVA' THEN r.totalKilos ELSE 0 END),
             SUM(CASE WHEN r.producto = 'GULUPA' THEN r.totalKilos ELSE 0 END)
         )
         FROM Remission r
         WHERE r.user.id = :userId
-        AND r.fechaDespacho >= first_day_of_month(subtract_months(CURRENT_TIMESTAMP, 11))
-        GROUP BY year(r.fechaDespacho), month(r.fechaDespacho), r.fechaDespacho
-        ORDER BY r.fechaDespacho DESC
+        AND r.fechaDespacho >= subtract_months(CURRENT_DATE, 11)
+        GROUP BY date_trunc('month', r.fechaDespacho)
+        ORDER BY date_trunc('month', r.fechaDespacho) DESC
     """)
     List<MonthlyStats> getMonthlySummaryByUserId(@Param("userId") Long userId);
 
@@ -45,7 +45,8 @@ public interface RemissionRepository extends JpaRepository<Remission, Long> {
             SUM(CASE WHEN r.producto = 'GULUPA' THEN r.totalKilos ELSE 0 END)
         )
         FROM Remission r
-        WHERE r.fechaDespacho BETWEEN first_day_of_month(CURRENT_TIMESTAMP) AND last_day_of_month(CURRENT_TIMESTAMP)
+        WHERE year(r.fechaDespacho) = year(CURRENT_DATE)
+        AND month(r.fechaDespacho) = month(CURRENT_DATE)
     """)
     CurrentMonthStats getCurrentMonthStats();
 
@@ -57,8 +58,8 @@ public interface RemissionRepository extends JpaRepository<Remission, Long> {
         )
         FROM Remission r
         WHERE r.user.id = :userId
-        AND r.fechaDespacho BETWEEN first_day_of_month(CURRENT_TIMESTAMP) AND last_day_of_month(CURRENT_TIMESTAMP)
+        AND year(r.fechaDespacho) = year(CURRENT_DATE)
+        AND month(r.fechaDespacho) = month(CURRENT_DATE)
     """)
     CurrentMonthStats getCurrentMonthStatsByUserId(@Param("userId") Long userId);
 }
-

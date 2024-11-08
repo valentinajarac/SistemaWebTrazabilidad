@@ -18,6 +18,10 @@ public class RemissionService {
     private final CropRepository cropRepository;
     private final ClientRepository clientRepository;
 
+    public List<Remission> getAllRemissions() {
+        return remissionRepository.findAll();
+    }
+
     public List<Remission> getRemissionsByUserId(Long userId) {
         return remissionRepository.findByUserId(userId);
     }
@@ -31,6 +35,7 @@ public class RemissionService {
     public Remission createRemission(Remission remission) {
         validateRemissionData(remission);
 
+        // Verificar que la finca existe y pertenece al usuario
         Farm farm = farmRepository.findById(remission.getFarm().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Finca no encontrada"));
 
@@ -38,6 +43,7 @@ public class RemissionService {
             throw new IllegalArgumentException("La finca no pertenece al usuario");
         }
 
+        // Verificar que el cultivo existe y pertenece a la finca
         Crop crop = cropRepository.findById(remission.getCrop().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Cultivo no encontrado"));
 
@@ -45,12 +51,17 @@ public class RemissionService {
             throw new IllegalArgumentException("El cultivo no pertenece a la finca seleccionada");
         }
 
-        remission.setProducto(crop.getProducto());
+        // Verificar que el producto coincide con el del cultivo
+        if (remission.getProducto() != crop.getProducto()) {
+            throw new IllegalArgumentException("El producto de la remisión debe coincidir con el del cultivo");
+        }
 
+        // Verificar que el cliente existe
         if (!clientRepository.existsById(remission.getClient().getId())) {
             throw new EntityNotFoundException("Cliente no encontrado");
         }
 
+        // Calcular total de kilos
         remission.setTotalKilos(remission.getCanastillasEnviadas() * remission.getKilosPromedio());
 
         return remissionRepository.save(remission);
@@ -60,48 +71,70 @@ public class RemissionService {
     public Remission updateRemission(Long id, Remission updatedRemission) {
         Remission existingRemission = getRemissionById(id);
 
+        // Validar y actualizar fecha de despacho
         if (updatedRemission.getFechaDespacho() != null) {
             existingRemission.setFechaDespacho(updatedRemission.getFechaDespacho());
         }
 
+        // Validar y actualizar canastillas enviadas
         if (updatedRemission.getCanastillasEnviadas() != null) {
             if (updatedRemission.getCanastillasEnviadas() <= 0) {
                 throw new IllegalArgumentException("El número de canastillas debe ser mayor a 0");
             }
             existingRemission.setCanastillasEnviadas(updatedRemission.getCanastillasEnviadas());
+            // Recalcular total de kilos
             existingRemission.setTotalKilos(
                     existingRemission.getCanastillasEnviadas() * existingRemission.getKilosPromedio());
         }
 
+        // Validar y actualizar kilos promedio
         if (updatedRemission.getKilosPromedio() != null) {
             if (updatedRemission.getKilosPromedio() <= 0) {
                 throw new IllegalArgumentException("Los kilos promedio deben ser mayor a 0");
             }
             existingRemission.setKilosPromedio(updatedRemission.getKilosPromedio());
+            // Recalcular total de kilos
             existingRemission.setTotalKilos(
                     existingRemission.getCanastillasEnviadas() * existingRemission.getKilosPromedio());
         }
 
-        if (updatedRemission.getFarm() != null && updatedRemission.getCrop() != null) {
+        // Validar y actualizar producto
+        if (updatedRemission.getProducto() != null) {
+            // Verificar que coincide con el producto del cultivo
+            if (updatedRemission.getProducto() != existingRemission.getCrop().getProducto()) {
+                throw new IllegalArgumentException("El producto debe coincidir con el del cultivo");
+            }
+            existingRemission.setProducto(updatedRemission.getProducto());
+        }
+
+        // Validar y actualizar finca
+        if (updatedRemission.getFarm() != null) {
             Farm farm = farmRepository.findById(updatedRemission.getFarm().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Finca no encontrada"));
 
             if (!farm.getUser().getId().equals(existingRemission.getUser().getId())) {
                 throw new IllegalArgumentException("La finca no pertenece al usuario");
             }
+            existingRemission.setFarm(farm);
+        }
 
+        // Validar y actualizar cultivo
+        if (updatedRemission.getCrop() != null) {
             Crop crop = cropRepository.findById(updatedRemission.getCrop().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Cultivo no encontrado"));
 
-            if (!crop.getFarm().getId().equals(farm.getId())) {
+            if (!crop.getFarm().getId().equals(existingRemission.getFarm().getId())) {
                 throw new IllegalArgumentException("El cultivo no pertenece a la finca seleccionada");
             }
 
-            existingRemission.setFarm(farm);
+            if (existingRemission.getProducto() != crop.getProducto()) {
+                throw new IllegalArgumentException("El producto debe coincidir con el del cultivo");
+            }
+
             existingRemission.setCrop(crop);
-            existingRemission.setProducto(crop.getProducto());
         }
 
+        // Validar y actualizar cliente
         if (updatedRemission.getClient() != null) {
             if (!clientRepository.existsById(updatedRemission.getClient().getId())) {
                 throw new EntityNotFoundException("Cliente no encontrado");
@@ -120,7 +153,11 @@ public class RemissionService {
         remissionRepository.deleteById(id);
     }
 
-    public List<MonthlyStats> getMonthlySummary(Long userId) {
+    public List<MonthlyStats> getMonthlySummary() {
+        return remissionRepository.getMonthlySummary();
+    }
+
+    public List<MonthlyStats> getMonthlySummaryByUserId(Long userId) {
         return remissionRepository.getMonthlySummaryByUserId(userId);
     }
 
@@ -168,3 +205,4 @@ public class RemissionService {
         }
     }
 }
+

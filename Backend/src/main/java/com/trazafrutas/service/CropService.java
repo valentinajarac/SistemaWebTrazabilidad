@@ -17,10 +17,33 @@ public class CropService {
     private final CropRepository cropRepository;
     private final FarmRepository farmRepository;
 
+    /**
+     * Obtiene todos los cultivos.
+     *
+     * @return Lista de todos los cultivos.
+     */
+    public List<Crop> getAllCrops() {
+        return cropRepository.findAll();
+    }
+
+    /**
+     * Obtiene los cultivos de un usuario específico.
+     *
+     * @param userId ID del usuario.
+     * @return Lista de cultivos del usuario.
+     */
     public List<Crop> getCropsByUserId(Long userId) {
         return cropRepository.findByUserIdWithFarm(userId);
     }
 
+    /**
+     * Obtiene los cultivos de una finca específica para un usuario.
+     *
+     * @param farmId ID de la finca.
+     * @param userId ID del usuario.
+     * @return Lista de cultivos de la finca.
+     * @throws EntityNotFoundException si la finca no existe o no pertenece al usuario.
+     */
     public List<Crop> getCropsByFarmId(Long farmId, Long userId) {
         Farm farm = farmRepository.findById(farmId)
                 .orElseThrow(() -> new EntityNotFoundException("Finca no encontrada"));
@@ -32,16 +55,29 @@ public class CropService {
         return cropRepository.findByFarmIdWithFarm(farmId);
     }
 
+    /**
+     * Obtiene un cultivo por su ID.
+     *
+     * @param id ID del cultivo.
+     * @return El cultivo encontrado.
+     * @throws EntityNotFoundException si el cultivo no existe.
+     */
     public Crop getCropById(Long id) {
         return cropRepository.findByIdWithFarm(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cultivo no encontrado"));
     }
 
+    /**
+     * Crea un nuevo cultivo.
+     *
+     * @param crop El cultivo a crear.
+     * @return El cultivo creado.
+     * @throws IllegalArgumentException si los datos del cultivo no son válidos.
+     */
     @Transactional
     public Crop createCrop(Crop crop) {
         validateCropData(crop);
 
-        // Verificar que la finca existe y pertenece al usuario
         Farm farm = farmRepository.findById(crop.getFarm().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Finca no encontrada"));
 
@@ -49,7 +85,6 @@ public class CropService {
             throw new IllegalArgumentException("La finca no pertenece al usuario");
         }
 
-        // Calcular hectáreas disponibles
         double hectareasUsadas = cropRepository.sumHectareasByFarmId(farm.getId());
         double hectareasDisponibles = farm.getHectareas() - hectareasUsadas;
 
@@ -63,11 +98,18 @@ public class CropService {
         return cropRepository.save(crop);
     }
 
+    /**
+     * Actualiza un cultivo existente.
+     *
+     * @param id ID del cultivo a actualizar.
+     * @param updatedCrop Datos actualizados del cultivo.
+     * @return El cultivo actualizado.
+     * @throws IllegalArgumentException si los datos del cultivo no son válidos.
+     */
     @Transactional
     public Crop updateCrop(Long id, Crop updatedCrop) {
         Crop existingCrop = getCropById(id);
 
-        // Validar y actualizar número de plantas
         if (updatedCrop.getNumeroPlants() != null) {
             if (updatedCrop.getNumeroPlants() <= 0) {
                 throw new IllegalArgumentException("El número de plantas debe ser mayor a 0");
@@ -75,13 +117,11 @@ public class CropService {
             existingCrop.setNumeroPlants(updatedCrop.getNumeroPlants());
         }
 
-        // Validar y actualizar hectáreas
         if (updatedCrop.getHectareas() != null) {
             if (updatedCrop.getHectareas() <= 0) {
                 throw new IllegalArgumentException("Las hectáreas deben ser mayor a 0");
             }
 
-            // Si cambia la finca, verificar hectáreas disponibles en la nueva finca
             Farm farm = existingCrop.getFarm();
             if (updatedCrop.getFarm() != null && !updatedCrop.getFarm().getId().equals(farm.getId())) {
                 farm = farmRepository.findById(updatedCrop.getFarm().getId())
@@ -105,17 +145,14 @@ public class CropService {
             existingCrop.setHectareas(updatedCrop.getHectareas());
         }
 
-        // Validar y actualizar producto
         if (updatedCrop.getProducto() != null) {
             existingCrop.setProducto(updatedCrop.getProducto());
         }
 
-        // Validar y actualizar estado
         if (updatedCrop.getEstado() != null) {
             existingCrop.setEstado(updatedCrop.getEstado());
         }
 
-        // Validar y actualizar finca
         if (updatedCrop.getFarm() != null) {
             Farm farm = farmRepository.findById(updatedCrop.getFarm().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Finca no encontrada"));
@@ -129,6 +166,12 @@ public class CropService {
         return cropRepository.save(existingCrop);
     }
 
+    /**
+     * Elimina un cultivo por su ID.
+     *
+     * @param id ID del cultivo a eliminar.
+     * @throws EntityNotFoundException si el cultivo no existe.
+     */
     @Transactional
     public void deleteCrop(Long id) {
         if (!cropRepository.existsById(id)) {
@@ -137,6 +180,12 @@ public class CropService {
         cropRepository.deleteById(id);
     }
 
+    /**
+     * Valida los datos de un cultivo.
+     *
+     * @param crop El cultivo a validar.
+     * @throws IllegalArgumentException si los datos no son válidos.
+     */
     private void validateCropData(Crop crop) {
         StringBuilder errors = new StringBuilder();
 

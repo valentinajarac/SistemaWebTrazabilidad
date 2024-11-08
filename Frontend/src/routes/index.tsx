@@ -6,6 +6,9 @@ import { Login } from '../pages/Login';
 import { AdminDashboard } from '../pages/admin/Dashboard';
 import { Users } from '../pages/admin/Users';
 import { Clients } from '../pages/admin/Clients';
+import { AdminRemissions } from '../pages/admin/AdminRemissions';
+import { AdminFarms } from '../pages/admin/AdminFarms';
+import { AdminCrops } from '../pages/admin/AdminCrops';
 import { Farms } from '../pages/producer/Farms';
 import { Crops } from '../pages/producer/Crops';
 import { Remissions } from '../pages/producer/Remissions';
@@ -66,6 +69,33 @@ export const AppRoutes: React.FC = () => {
           />
         }
       />
+      <Route
+        path="/admin/remissions"
+        element={
+          <PrivateRoute
+            element={<AdminRemissions />}
+            requiredRole="ADMIN"
+          />
+        }
+      />
+      <Route
+        path="/admin/farms"
+        element={
+          <PrivateRoute
+            element={<AdminFarms />}
+            requiredRole="ADMIN"
+          />
+        }
+      />
+      <Route
+        path="/admin/crops"
+        element={
+          <PrivateRoute
+            element={<AdminCrops />}
+            requiredRole="ADMIN"
+          />
+        }
+      />
 
       {/* Rutas del Productor */}
       <Route
@@ -118,3 +148,4 @@ export const AppRoutes: React.FC = () => {
     </Routes>
   );
 };
+

@@ -2,14 +2,14 @@ package com.trazafrutas.service;
 
 import com.trazafrutas.dto.MonthlyStats;
 import com.trazafrutas.dto.CurrentMonthStats;
+import com.trazafrutas.dto.DashboardStats;
+import com.trazafrutas.model.enums.ProductType;
 import com.trazafrutas.model.enums.Role;
 import com.trazafrutas.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -19,31 +19,32 @@ public class DashboardService {
     private final CropRepository cropRepository;
     private final RemissionRepository remissionRepository;
 
-    public Map<String, Object> getAdminStats() {
-        Map<String, Object> stats = new HashMap<>();
+    public DashboardStats getAdminStats() {
+        DashboardStats stats = new DashboardStats();
 
-        // Contar productores (usuarios con rol PRODUCER)
-        long totalProductores = userRepository.countByRole(Role.PRODUCER);
-        stats.put("totalProductores", totalProductores);
+        // Estadísticas de productores
+        stats.setTotalProductores(userRepository.countByRole(Role.PRODUCER));
+        stats.setProductoresUchuva(cropRepository.countProducersByProducto(ProductType.UCHUVA));
+        stats.setProductoresGulupa(cropRepository.countProducersByProducto(ProductType.GULUPA));
 
-        // Contar fincas
-        long totalFincas = farmRepository.count();
-        stats.put("totalFincas", totalFincas);
+        // Estadísticas de fincas
+        stats.setTotalFincas(farmRepository.count());
 
-        // Contar cultivos
-        long totalCultivos = cropRepository.count();
-        stats.put("totalCultivos", totalCultivos);
+        // Estadísticas de cultivos
+        stats.setTotalCultivos(cropRepository.count());
+        stats.setCultivosUchuva(cropRepository.countByProducto(ProductType.UCHUVA));
+        stats.setCultivosGulupa(cropRepository.countByProducto(ProductType.GULUPA));
 
-        // Obtener estadísticas del mes actual
+        // Estadísticas del mes actual
         CurrentMonthStats monthlyStats = remissionRepository.getCurrentMonthStats();
         if (monthlyStats != null) {
-            stats.put("despachosMes", monthlyStats.getDespachos());
-            stats.put("kilosUchuvaMes", monthlyStats.getKilosUchuva());
-            stats.put("kilosGulupaMes", monthlyStats.getKilosGulupa());
+            stats.setDespachosMes(monthlyStats.getDespachos());
+            stats.setKilosUchuvaMes(monthlyStats.getKilosUchuva());
+            stats.setKilosGulupaMes(monthlyStats.getKilosGulupa());
         } else {
-            stats.put("despachosMes", 0L);
-            stats.put("kilosUchuvaMes", 0.0);
-            stats.put("kilosGulupaMes", 0.0);
+            stats.setDespachosMes(0L);
+            stats.setKilosUchuvaMes(0.0);
+            stats.setKilosGulupaMes(0.0);
         }
 
         return stats;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Users, Warehouse, Sprout, FileText, FileSpreadsheet
+  Users, Warehouse, Sprout, FileText, FileSpreadsheet,
+  Leaf, TrendingUp
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -100,6 +101,7 @@ export function AdminDashboard() {
         </div>
       </div>
 
+      {/* Estadísticas de Productores */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card
           title="Total Productores"
@@ -107,6 +109,22 @@ export function AdminDashboard() {
           icon={Users}
           loading={loading}
         />
+        <Card
+          title="Productores Uchuva"
+          value={stats?.productoresUchuva || 0}
+          icon={Sprout}
+          loading={loading}
+        />
+        <Card
+          title="Productores Gulupa"
+          value={stats?.productoresGulupa || 0}
+          icon={Leaf}
+          loading={loading}
+        />
+      </div>
+
+      {/* Estadísticas Adicionales */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card
           title="Total Fincas"
           value={stats?.totalFincas || 0}
@@ -117,6 +135,12 @@ export function AdminDashboard() {
           title="Total Cultivos"
           value={stats?.totalCultivos || 0}
           icon={Sprout}
+          loading={loading}
+        />
+        <Card
+          title="Despachos del Mes"
+          value={stats?.despachosMes || 0}
+          icon={TrendingUp}
           loading={loading}
         />
       </div>

@@ -1,7 +1,9 @@
+// src/main/java/com/trazafrutas/controller/FarmController.java
 package com.trazafrutas.controller;
 
 import com.trazafrutas.dto.ApiResponse;
 import com.trazafrutas.dto.FarmDTO;
+import com.trazafrutas.dto.admin.AdminFarmDTO;
 import com.trazafrutas.model.Farm;
 import com.trazafrutas.model.User;
 import com.trazafrutas.model.enums.Role;
@@ -20,18 +22,12 @@ import java.util.stream.Collectors;
 public class FarmController {
     private final FarmService farmService;
 
-    private ResponseEntity<?> checkProducerRole(User user) {
+    @GetMapping
+    public ResponseEntity<?> getMyFarms(@AuthenticationPrincipal User user) {
         if (user.getRole() != Role.PRODUCER) {
             return ResponseEntity.status(403)
                     .body(new ApiResponse(false, "Solo los productores pueden gestionar fincas"));
         }
-        return null;
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getMyFarms(@AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
 
         try {
             List<Farm> farms = farmService.getFarmsByUserId(user.getId());
@@ -47,12 +43,13 @@ public class FarmController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getFarmById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.PRODUCER) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los productores pueden gestionar fincas"));
+        }
 
         try {
             Farm farm = farmService.getFarmById(id);
-            // Verificar que la finca pertenece al usuario autenticado
             if (!farm.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "No tiene permiso para ver esta finca"));
@@ -66,8 +63,10 @@ public class FarmController {
 
     @PostMapping
     public ResponseEntity<?> createFarm(@RequestBody Farm farm, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.PRODUCER) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los productores pueden gestionar fincas"));
+        }
 
         try {
             farm.setUser(user);
@@ -87,11 +86,12 @@ public class FarmController {
             @PathVariable Long id,
             @RequestBody Farm farm,
             @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.PRODUCER) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los productores pueden gestionar fincas"));
+        }
 
         try {
-            // Verificar que la finca existe y pertenece al usuario
             Farm existingFarm = farmService.getFarmById(id);
             if (!existingFarm.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
@@ -112,11 +112,12 @@ public class FarmController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFarm(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.PRODUCER) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los productores pueden gestionar fincas"));
+        }
 
         try {
-            // Verificar que la finca existe y pertenece al usuario
             Farm farm = farmService.getFarmById(id);
             if (!farm.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
@@ -129,6 +130,25 @@ public class FarmController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<?> getAllFarmsForAdmin(@AuthenticationPrincipal User user) {
+        if (user.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los administradores pueden ver todas las fincas"));
+        }
+
+        try {
+            List<Farm> farms = farmService.getAllFarms();
+            List<AdminFarmDTO> farmDTOs = farms.stream()
+                    .map(AdminFarmDTO::fromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new ApiResponse(true, "Fincas obtenidas exitosamente", farmDTOs));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(new ApiResponse(false, "Error al obtener las fincas: " + e.getMessage()));
         }
     }
 }

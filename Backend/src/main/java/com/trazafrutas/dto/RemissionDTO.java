@@ -14,6 +14,7 @@ public class RemissionDTO {
     private Double totalKilos;
     private ProductType producto;
     private Long userId;
+    private String nombreProductor; // Agregado
     private Long farmId;
     private String farmNombre;
     private Long cropId;
@@ -30,6 +31,7 @@ public class RemissionDTO {
         dto.setTotalKilos(remission.getTotalKilos());
         dto.setProducto(remission.getProducto());
         dto.setUserId(remission.getUser().getId());
+        dto.setNombreProductor(remission.getUser().getNombreCompleto()); 
         dto.setFarmId(remission.getFarm().getId());
         dto.setFarmNombre(remission.getFarm().getNombre());
         dto.setCropId(remission.getCrop().getId());
