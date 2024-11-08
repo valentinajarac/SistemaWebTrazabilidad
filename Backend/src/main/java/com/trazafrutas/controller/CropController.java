@@ -1,6 +1,7 @@
 package com.trazafrutas.controller;
 
 import com.trazafrutas.dto.ApiResponse;
+import com.trazafrutas.dto.CropDTO;
 import com.trazafrutas.model.Crop;
 import com.trazafrutas.model.User;
 import com.trazafrutas.model.enums.Role;
@@ -11,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/crops")
@@ -18,22 +20,15 @@ import java.util.List;
 public class CropController {
     private final CropService cropService;
 
-    private ResponseEntity<?> checkProducerRole(User user) {
-        if (user.getRole() != Role.PRODUCER) {
-            return ResponseEntity.status(403)
-                    .body(new ApiResponse(false, "Solo los productores pueden gestionar cultivos"));
-        }
-        return null;
-    }
-
     @GetMapping
     public ResponseEntity<?> getMyCrops(@AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            // Solo obtener los cultivos del usuario autenticado
             List<Crop> crops = cropService.getCropsByUserId(user.getId());
-            return ResponseEntity.ok(new ApiResponse(true, "Cultivos obtenidos exitosamente", crops));
+            List<CropDTO> cropDTOs = crops.stream()
+                    .map(CropDTO::fromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new ApiResponse(true, "Cultivos obtenidos exitosamente", cropDTOs));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(new ApiResponse(false, "Error al obtener los cultivos: " + e.getMessage()));
@@ -44,12 +39,13 @@ public class CropController {
     public ResponseEntity<?> getCropsByFarmId(
             @PathVariable Long farmId,
             @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            // Verificar que la finca pertenezca al usuario
             List<Crop> crops = cropService.getCropsByFarmId(farmId, user.getId());
-            return ResponseEntity.ok(new ApiResponse(true, "Cultivos obtenidos exitosamente", crops));
+            List<CropDTO> cropDTOs = crops.stream()
+                    .map(CropDTO::fromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new ApiResponse(true, "Cultivos obtenidos exitosamente", cropDTOs));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(403)
                     .body(new ApiResponse(false, e.getMessage()));
@@ -61,16 +57,14 @@ public class CropController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCropById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
             Crop crop = cropService.getCropById(id);
+            // Verificar que el cultivo pertenezca al usuario
             if (!crop.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "No tiene permiso para ver este cultivo"));
             }
-            return ResponseEntity.ok(new ApiResponse(true, "Cultivo encontrado", crop));
+            return ResponseEntity.ok(new ApiResponse(true, "Cultivo encontrado", CropDTO.fromEntity(crop)));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
@@ -79,13 +73,11 @@ public class CropController {
 
     @PostMapping
     public ResponseEntity<?> createCrop(@RequestBody Crop crop, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            // Asignar el usuario actual al cultivo
             crop.setUser(user);
             Crop newCrop = cropService.createCrop(crop);
-            return ResponseEntity.ok(new ApiResponse(true, "Cultivo creado exitosamente", newCrop));
+            return ResponseEntity.ok(new ApiResponse(true, "Cultivo creado exitosamente", CropDTO.fromEntity(newCrop)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
@@ -100,18 +92,17 @@ public class CropController {
             @PathVariable Long id,
             @RequestBody Crop crop,
             @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
             Crop existingCrop = cropService.getCropById(id);
+            // Verificar que el cultivo pertenezca al usuario
             if (!existingCrop.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "No tiene permiso para modificar este cultivo"));
             }
 
+            crop.setUser(user);
             Crop updatedCrop = cropService.updateCrop(id, crop);
-            return ResponseEntity.ok(new ApiResponse(true, "Cultivo actualizado exitosamente", updatedCrop));
+            return ResponseEntity.ok(new ApiResponse(true, "Cultivo actualizado exitosamente", CropDTO.fromEntity(updatedCrop)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
@@ -123,11 +114,9 @@ public class CropController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCrop(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkProducerRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
             Crop crop = cropService.getCropById(id);
+            // Verificar que el cultivo pertenezca al usuario
             if (!crop.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "No tiene permiso para eliminar este cultivo"));

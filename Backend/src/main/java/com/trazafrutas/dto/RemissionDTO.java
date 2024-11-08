@@ -1,5 +1,6 @@
 package com.trazafrutas.dto;
 
+import com.trazafrutas.model.Remission;
 import com.trazafrutas.model.enums.ProductType;
 import lombok.Data;
 import java.time.LocalDate;
@@ -14,6 +15,27 @@ public class RemissionDTO {
     private ProductType producto;
     private Long userId;
     private Long farmId;
+    private String farmNombre;
     private Long cropId;
+    private String cropDescripcion;
     private Long clientId;
+    private String clientNombre;
+
+    public static RemissionDTO fromEntity(Remission remission) {
+        RemissionDTO dto = new RemissionDTO();
+        dto.setId(remission.getId());
+        dto.setFechaDespacho(remission.getFechaDespacho());
+        dto.setCanastillasEnviadas(remission.getCanastillasEnviadas());
+        dto.setKilosPromedio(remission.getKilosPromedio());
+        dto.setTotalKilos(remission.getTotalKilos());
+        dto.setProducto(remission.getProducto());
+        dto.setUserId(remission.getUser().getId());
+        dto.setFarmId(remission.getFarm().getId());
+        dto.setFarmNombre(remission.getFarm().getNombre());
+        dto.setCropId(remission.getCrop().getId());
+        dto.setCropDescripcion(remission.getCrop().getProducto() + " - " + remission.getCrop().getEstado());
+        dto.setClientId(remission.getClient().getId());
+        dto.setClientNombre(remission.getClient().getNombre());
+        return dto;
+    }
 }

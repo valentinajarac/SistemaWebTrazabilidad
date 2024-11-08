@@ -18,20 +18,10 @@ import java.util.List;
 public class ClientController {
     private final ClientService clientService;
 
-    private ResponseEntity<?> checkAdminRole(User user) {
-        if (user.getRole() != Role.ADMIN) {
-            return ResponseEntity.status(403)
-                    .body(new ApiResponse(false, "Solo los administradores pueden gestionar clientes"));
-        }
-        return null;
-    }
-
     @GetMapping
     public ResponseEntity<?> getAllClients(@AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkAdminRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            // Permitir acceso tanto a administradores como a productores
             List<Client> clients = clientService.getAllClients();
             return ResponseEntity.ok(new ApiResponse(true, "Clientes obtenidos exitosamente", clients));
         } catch (Exception e) {
@@ -42,10 +32,8 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getClientById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkAdminRole(user);
-        if (roleCheck != null) return roleCheck;
-
         try {
+            // Permitir acceso tanto a administradores como a productores
             Client client = clientService.getClientById(id);
             return ResponseEntity.ok(new ApiResponse(true, "Cliente encontrado", client));
         } catch (Exception e) {
@@ -56,8 +44,10 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<?> createClient(@RequestBody Client client, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkAdminRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los administradores pueden crear clientes"));
+        }
 
         try {
             Client newClient = clientService.createClient(client);
@@ -76,8 +66,10 @@ public class ClientController {
             @PathVariable Long id,
             @RequestBody Client client,
             @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkAdminRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los administradores pueden modificar clientes"));
+        }
 
         try {
             Client updatedClient = clientService.updateClient(id, client);
@@ -93,8 +85,10 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteClient(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkAdminRole(user);
-        if (roleCheck != null) return roleCheck;
+        if (user.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Solo los administradores pueden eliminar clientes"));
+        }
 
         try {
             clientService.deleteClient(id);

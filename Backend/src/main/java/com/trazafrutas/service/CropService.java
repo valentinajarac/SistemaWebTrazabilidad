@@ -18,7 +18,7 @@ public class CropService {
     private final FarmRepository farmRepository;
 
     public List<Crop> getCropsByUserId(Long userId) {
-        return cropRepository.findByUserId(userId);
+        return cropRepository.findByUserIdWithFarm(userId);
     }
 
     public List<Crop> getCropsByFarmId(Long farmId, Long userId) {
@@ -29,11 +29,11 @@ public class CropService {
             throw new IllegalArgumentException("La finca no pertenece al usuario");
         }
 
-        return cropRepository.findByFarmId(farmId);
+        return cropRepository.findByFarmIdWithFarm(farmId);
     }
 
     public Crop getCropById(Long id) {
-        return cropRepository.findById(id)
+        return cropRepository.findByIdWithFarm(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cultivo no encontrado"));
     }
 
@@ -55,9 +55,11 @@ public class CropService {
 
         if (crop.getHectareas() > hectareasDisponibles) {
             throw new IllegalArgumentException(
-                    String.format("La finca solo tiene %.2f hectáreas disponibles", hectareasDisponibles));
+                    String.format("La finca solo tiene %.2f hectáreas disponibles de %.2f hectáreas totales",
+                            hectareasDisponibles, farm.getHectareas()));
         }
 
+        crop.setFarm(farm);
         return cropRepository.save(crop);
     }
 
@@ -96,7 +98,8 @@ public class CropService {
 
             if (updatedCrop.getHectareas() > hectareasDisponibles) {
                 throw new IllegalArgumentException(
-                        String.format("La finca solo tiene %.2f hectáreas disponibles", hectareasDisponibles));
+                        String.format("La finca solo tiene %.2f hectáreas disponibles de %.2f hectáreas totales",
+                                hectareasDisponibles, farm.getHectareas()));
             }
 
             existingCrop.setHectareas(updatedCrop.getHectareas());

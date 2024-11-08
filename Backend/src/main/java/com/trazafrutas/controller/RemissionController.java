@@ -1,7 +1,7 @@
 package com.trazafrutas.controller;
 
 import com.trazafrutas.dto.ApiResponse;
-import com.trazafrutas.dto.MonthlyStats;
+import com.trazafrutas.dto.RemissionDTO;
 import com.trazafrutas.model.Remission;
 import com.trazafrutas.model.User;
 import com.trazafrutas.model.enums.Role;
@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/remissions")
@@ -34,7 +35,10 @@ public class RemissionController {
 
         try {
             List<Remission> remissions = remissionService.getRemissionsByUserId(user.getId());
-            return ResponseEntity.ok(new ApiResponse(true, "Remisiones obtenidas exitosamente", remissions));
+            List<RemissionDTO> remissionDTOs = remissions.stream()
+                    .map(RemissionDTO::fromEntity)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new ApiResponse(true, "Remisiones obtenidas exitosamente", remissionDTOs));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(new ApiResponse(false, "Error al obtener las remisiones: " + e.getMessage()));
@@ -52,7 +56,7 @@ public class RemissionController {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "No tiene permiso para ver esta remisión"));
             }
-            return ResponseEntity.ok(new ApiResponse(true, "Remisión encontrada", remission));
+            return ResponseEntity.ok(new ApiResponse(true, "Remisión encontrada", RemissionDTO.fromEntity(remission)));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
@@ -67,7 +71,7 @@ public class RemissionController {
         try {
             remission.setUser(user);
             Remission newRemission = remissionService.createRemission(remission);
-            return ResponseEntity.ok(new ApiResponse(true, "Remisión creada exitosamente", newRemission));
+            return ResponseEntity.ok(new ApiResponse(true, "Remisión creada exitosamente", RemissionDTO.fromEntity(newRemission)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
@@ -92,8 +96,9 @@ public class RemissionController {
                         .body(new ApiResponse(false, "No tiene permiso para modificar esta remisión"));
             }
 
+            remission.setUser(user);
             Remission updatedRemission = remissionService.updateRemission(id, remission);
-            return ResponseEntity.ok(new ApiResponse(true, "Remisión actualizada exitosamente", updatedRemission));
+            return ResponseEntity.ok(new ApiResponse(true, "Remisión actualizada exitosamente", RemissionDTO.fromEntity(updatedRemission)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, e.getMessage()));
@@ -129,8 +134,8 @@ public class RemissionController {
         if (roleCheck != null) return roleCheck;
 
         try {
-            List<MonthlyStats> summary = remissionService.getMonthlySummary(user.getId());
-            return ResponseEntity.ok(new ApiResponse(true, "Resumen mensual obtenido exitosamente", summary));
+            var monthlyStats = remissionService.getMonthlySummary(user.getId());
+            return ResponseEntity.ok(new ApiResponse(true, "Resumen mensual obtenido exitosamente", monthlyStats));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(new ApiResponse(false, "Error al obtener el resumen mensual: " + e.getMessage()));

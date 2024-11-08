@@ -18,6 +18,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "cedula")
     private String cedula;
 
     @Column(name = "nombre_completo")
@@ -26,12 +27,20 @@ public class User implements UserDetails {
     @Column(name = "codigo_trazabilidad")
     private String codigoTrazabilidad;
 
+    @Column(name = "municipio")
     private String municipio;
+
+    @Column(name = "telefono")
     private String telefono;
+
+    @Column(name = "usuario")
     private String usuario;
+
+    @Column(name = "password")
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Role role;
 
     @Override
