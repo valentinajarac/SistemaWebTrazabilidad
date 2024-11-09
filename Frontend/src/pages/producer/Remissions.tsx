@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, FileSpreadsheet, Download, Calendar } from 'lucide-react';
 import { Remission, Farm, Crop, Client } from '../../types';
 import { DataTable } from '../../components/DataTable';
 import { Modal } from '../../components/ui/Modal';
@@ -8,8 +8,9 @@ import { Alert } from '../../components/ui/Alert';
 import { SearchBar } from '../../components/SearchBar';
 import { RemissionForm } from '../../components/forms/RemissionForm';
 import api from '../../api/config';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { es } from 'date-fns/locale';
+import * as XLSX from 'xlsx';
 
 export function Remissions() {
   const [remissions, setRemissions] = useState<Remission[]>([]);
@@ -22,6 +23,7 @@ export function Remissions() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
 
   useEffect(() => {
     fetchRemissions();
@@ -170,6 +172,69 @@ export function Remissions() {
     }
   };
 
+  const exportToExcel = (data: Remission[], fileName: string) => {
+    const worksheet = XLSX.utils.json_to_sheet(
+      data.map(remission => ({
+        'Fecha': format(new Date(remission.fechaDespacho), 'dd/MM/yyyy', { locale: es }),
+        'Finca': remission.farm.nombre,
+        'Producto': remission.producto.charAt(0) + remission.producto.slice(1).toLowerCase(),
+        'Canastillas': remission.canastillasEnviadas,
+        'Kilos Promedio': Number(remission.kilosPromedio.toFixed(2)),
+        'Total Kilos': Number(remission.totalKilos.toFixed(2)),
+        'Cliente': remission.client.nombre
+      }))
+    );
+
+    const columnWidths = [
+      { wch: 12 }, // Fecha
+      { wch: 20 }, // Finca
+      { wch: 10 }, // Producto
+      { wch: 12 }, // Canastillas
+      { wch: 15 }, // Kilos Promedio
+      { wch: 12 }, // Total Kilos
+      { wch: 25 }, // Cliente
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Remisiones');
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
+  const exportSingleRemission = (remission: Remission) => {
+    exportToExcel([remission], `remision_${remission.id}_${format(new Date(remission.fechaDespacho), 'dd-MM-yyyy')}`);
+  };
+
+  const exportSelectedMonth = () => {
+    const selectedDate = parse(selectedMonth, 'yyyy-MM', new Date());
+    const selectedMonthNumber = selectedDate.getMonth();
+    const selectedYear = selectedDate.getFullYear();
+
+    const monthlyRemissions = remissions.filter(remission => {
+      const remissionDate = new Date(remission.fechaDespacho);
+      return remissionDate.getMonth() === selectedMonthNumber && 
+             remissionDate.getFullYear() === selectedYear;
+    });
+
+    if (monthlyRemissions.length === 0) {
+      setError(`No hay remisiones para ${format(selectedDate, 'MMMM yyyy', { locale: es })}`);
+      return;
+    }
+
+    exportToExcel(
+      monthlyRemissions,
+      `mis_remisiones_${format(selectedDate, 'MMMM_yyyy', { locale: es })}`
+    );
+  };
+
+  const exportAll = () => {
+    if (remissions.length === 0) {
+      setError('No hay remisiones para exportar');
+      return;
+    }
+    exportToExcel(remissions, `todas_mis_remisiones_${format(new Date(), 'dd-MM-yyyy')}`);
+  };
+
   const columns = [
     { 
       key: 'fechaDespacho', 
@@ -203,24 +268,75 @@ export function Remissions() {
     { 
       key: 'client.nombre', 
       label: 'Cliente'
+    },
+    {
+      key: 'actions',
+      label: 'Exportar',
+      render: (_: any, remission: Remission) => (
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={Download}
+          onClick={() => exportSingleRemission(remission)}
+        >
+          Excel
+        </Button>
+      )
     }
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
         <h1 className="text-2xl font-bold text-gray-800">Remisiones de Campo</h1>
-        <Button
-          onClick={() => {
-            setCurrentRemission(null);
-            setIsModalOpen(true);
-          }}
-          variant="primary"
-          icon={PlusCircle}
-          disabled={loading}
-        >
-          Nueva Remisión
-        </Button>
+        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="flex-1 sm:flex-none">
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-gray-500" />
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              icon={FileSpreadsheet}
+              onClick={exportSelectedMonth}
+              disabled={loading}
+              className="whitespace-nowrap"
+            >
+              <span className="hidden sm:inline">Exportar Mes</span>
+              <span className="sm:hidden">Mes</span>
+            </Button>
+          </div>
+
+          <Button
+            variant="secondary"
+            icon={FileSpreadsheet}
+            onClick={exportAll}
+            disabled={loading}
+            className="whitespace-nowrap"
+          >
+            <span className="hidden sm:inline">Exportar Todo</span>
+            <span className="sm:hidden">Todo</span>
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentRemission(null);
+              setIsModalOpen(true);
+            }}
+            variant="primary"
+            icon={PlusCircle}
+            disabled={loading}
+          >
+            Nueva Remisión
+          </Button>
+        </div>
       </div>
 
       {error && (
