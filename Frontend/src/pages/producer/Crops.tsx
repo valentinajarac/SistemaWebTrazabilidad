@@ -5,21 +5,45 @@ import { DataTable } from '../../components/DataTable';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { SearchBar } from '../../components/SearchBar';
 import { CropForm } from '../../components/forms/CropForm';
 import api from '../../api/config';
 
 export function Crops() {
   const [crops, setCrops] = useState<Crop[]>([]);
+  const [filteredCrops, setFilteredCrops] = useState<Crop[]>([]);
   const [farms, setFarms] = useState<Farm[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCrop, setCurrentCrop] = useState<Crop | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchCrops();
     fetchFarms();
   }, []);
+
+  useEffect(() => {
+    filterCrops();
+  }, [searchTerm, crops]);
+
+  const filterCrops = () => {
+    if (!searchTerm.trim()) {
+      setFilteredCrops(crops);
+      return;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase();
+    const filtered = crops.filter(crop => 
+      crop.numeroPlants.toString().includes(searchTermLower) ||
+      crop.hectareas.toString().includes(searchTermLower) ||
+      crop.producto.toLowerCase().includes(searchTermLower) ||
+      crop.estado.toLowerCase().includes(searchTermLower) ||
+      crop.farmNombre?.toLowerCase().includes(searchTermLower)
+    );
+    setFilteredCrops(filtered);
+  };
 
   const fetchCrops = async () => {
     try {
@@ -28,6 +52,7 @@ export function Crops() {
       const response = await api.get('/crops');
       if (response.data.success) {
         setCrops(response.data.data);
+        setFilteredCrops(response.data.data);
       } else {
         setError(response.data.message);
       }
@@ -152,9 +177,15 @@ export function Crops() {
         />
       )}
 
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Buscar cultivos..."
+      />
+
       <DataTable
         columns={columns}
-        data={crops}
+        data={filteredCrops}
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}

@@ -5,19 +5,41 @@ import { DataTable } from '../../components/DataTable';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { SearchBar } from '../../components/SearchBar';
 import { FarmForm } from '../../components/forms/FarmForm';
 import api from '../../api/config';
 
 export function Farms() {
   const [farms, setFarms] = useState<Farm[]>([]);
+  const [filteredFarms, setFilteredFarms] = useState<Farm[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentFarm, setCurrentFarm] = useState<Farm | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchFarms();
   }, []);
+
+  useEffect(() => {
+    filterFarms();
+  }, [searchTerm, farms]);
+
+  const filterFarms = () => {
+    if (!searchTerm.trim()) {
+      setFilteredFarms(farms);
+      return;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase();
+    const filtered = farms.filter(farm => 
+      farm.nombre.toLowerCase().includes(searchTermLower) ||
+      farm.municipio.toLowerCase().includes(searchTermLower) ||
+      farm.hectareas.toString().includes(searchTermLower)
+    );
+    setFilteredFarms(filtered);
+  };
 
   const fetchFarms = async () => {
     try {
@@ -25,6 +47,7 @@ export function Farms() {
       const response = await api.get('/farms');
       if (response.data.success) {
         setFarms(response.data.data);
+        setFilteredFarms(response.data.data);
       } else {
         setError(response.data.message);
       }
@@ -112,9 +135,15 @@ export function Farms() {
         />
       )}
 
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Buscar fincas..."
+      />
+
       <DataTable
         columns={columns}
-        data={farms}
+        data={filteredFarms}
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}

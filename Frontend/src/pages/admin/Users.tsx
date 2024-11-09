@@ -5,13 +5,17 @@ import { DataTable } from '../../components/DataTable';
 import { Plus, X } from 'lucide-react';
 import api from '../../api/config';
 import { Alert } from '../../components/ui/Alert';
+import { Button } from '../../components/ui/Button';
+import { SearchBar } from '../../components/SearchBar';
 
 export const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<User>();
 
@@ -19,12 +23,35 @@ export const Users: React.FC = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    filterUsers();
+  }, [searchTerm, users]);
+
+  const filterUsers = () => {
+    if (!searchTerm.trim()) {
+      setFilteredUsers(users);
+      return;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase();
+    const filtered = users.filter(user => 
+      user.cedula.toLowerCase().includes(searchTermLower) ||
+      user.nombreCompleto.toLowerCase().includes(searchTermLower) ||
+      user.codigoTrazabilidad.toLowerCase().includes(searchTermLower) ||
+      user.municipio.toLowerCase().includes(searchTermLower) ||
+      user.telefono.toLowerCase().includes(searchTermLower) ||
+      user.usuario.toLowerCase().includes(searchTermLower)
+    );
+    setFilteredUsers(filtered);
+  };
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await api.get('/users');
       if (response.data.success) {
         setUsers(response.data.data);
+        setFilteredUsers(response.data.data);
       } else {
         setError(response.data.message || 'Error al cargar usuarios');
       }
@@ -107,23 +134,29 @@ export const Users: React.FC = () => {
 
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-        <button
+        <Button
           onClick={() => {
             setEditingUser(null);
             reset({});
             setShowModal(true);
           }}
-          className="bg-green-500 text-white px-4 py-2 rounded flex items-center"
+          variant="primary"
+          icon={Plus}
           disabled={loading}
         >
-          <Plus className="w-4 h-4 mr-2" />
           Nuevo Usuario
-        </button>
+        </Button>
       </div>
+
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Buscar usuarios..."
+      />
 
       <DataTable
         columns={columns}
-        data={users}
+        data={filteredUsers}
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}

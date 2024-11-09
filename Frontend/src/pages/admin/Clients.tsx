@@ -4,21 +4,46 @@ import { Client } from '../../types';
 import { DataTable } from '../../components/DataTable';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
+import { SearchBar } from '../../components/SearchBar';
 import { Plus, X } from 'lucide-react';
 import api from '../../api/config';
 
 export const Clients: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Client>();
 
   useEffect(() => {
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    filterClients();
+  }, [searchTerm, clients]);
+
+  const filterClients = () => {
+    if (!searchTerm.trim()) {
+      setFilteredClients(clients);
+      return;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase();
+    const filtered = clients.filter(client => 
+      client.nit.toLowerCase().includes(searchTermLower) ||
+      client.nombre.toLowerCase().includes(searchTermLower) ||
+      client.floid.toLowerCase().includes(searchTermLower) ||
+      client.direccion.toLowerCase().includes(searchTermLower) ||
+      client.telefono.toLowerCase().includes(searchTermLower) ||
+      client.email.toLowerCase().includes(searchTermLower)
+    );
+    setFilteredClients(filtered);
+  };
 
   const fetchClients = async () => {
     try {
@@ -28,6 +53,7 @@ export const Clients: React.FC = () => {
       
       if (response.data.success) {
         setClients(response.data.data);
+        setFilteredClients(response.data.data);
       } else {
         setError(response.data.message || 'Error al cargar los clientes');
       }
@@ -128,9 +154,15 @@ export const Clients: React.FC = () => {
         />
       )}
 
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Buscar clientes..."
+      />
+
       <DataTable
         columns={columns}
-        data={clients}
+        data={filteredClients}
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}

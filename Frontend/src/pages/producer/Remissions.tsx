@@ -5,6 +5,7 @@ import { DataTable } from '../../components/DataTable';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { SearchBar } from '../../components/SearchBar';
 import { RemissionForm } from '../../components/forms/RemissionForm';
 import api from '../../api/config';
 import { format } from 'date-fns';
@@ -12,6 +13,7 @@ import { es } from 'date-fns/locale';
 
 export function Remissions() {
   const [remissions, setRemissions] = useState<Remission[]>([]);
+  const [filteredRemissions, setFilteredRemissions] = useState<Remission[]>([]);
   const [farms, setFarms] = useState<Farm[]>([]);
   const [crops, setCrops] = useState<Crop[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -19,6 +21,7 @@ export function Remissions() {
   const [currentRemission, setCurrentRemission] = useState<Remission | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchRemissions();
@@ -26,6 +29,36 @@ export function Remissions() {
     fetchCrops();
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    filterRemissions();
+  }, [searchTerm, remissions]);
+
+  const sortRemissionsByDate = (remissionsToSort: Remission[]) => {
+    return [...remissionsToSort].sort((a, b) => {
+      const dateA = new Date(a.fechaDespacho).getTime();
+      const dateB = new Date(b.fechaDespacho).getTime();
+      return dateB - dateA; // Orden descendente (más reciente primero)
+    });
+  };
+
+  const filterRemissions = () => {
+    if (!searchTerm.trim()) {
+      setFilteredRemissions(sortRemissionsByDate(remissions));
+      return;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase();
+    const filtered = remissions.filter(remission => 
+      format(new Date(remission.fechaDespacho), 'dd/MM/yyyy', { locale: es }).toLowerCase().includes(searchTermLower) ||
+      remission.farm.nombre.toLowerCase().includes(searchTermLower) ||
+      remission.producto.toLowerCase().includes(searchTermLower) ||
+      remission.client.nombre.toLowerCase().includes(searchTermLower) ||
+      remission.canastillasEnviadas.toString().includes(searchTermLower) ||
+      remission.totalKilos.toString().includes(searchTermLower)
+    );
+    setFilteredRemissions(sortRemissionsByDate(filtered));
+  };
 
   const fetchRemissions = async () => {
     try {
@@ -38,7 +71,9 @@ export function Remissions() {
           farm: farms.find(f => f.id === remission.farmId) || { nombre: 'N/A' },
           client: clients.find(c => c.id === remission.clientId) || { nombre: 'N/A' }
         }));
-        setRemissions(transformedRemissions);
+        const sortedRemissions = sortRemissionsByDate(transformedRemissions);
+        setRemissions(sortedRemissions);
+        setFilteredRemissions(sortedRemissions);
       } else {
         setError(response.data.message);
       }
@@ -196,9 +231,15 @@ export function Remissions() {
         />
       )}
 
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Buscar remisiones..."
+      />
+
       <DataTable
         columns={columns}
-        data={remissions}
+        data={filteredRemissions}
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}
@@ -222,4 +263,3 @@ export function Remissions() {
     </div>
   );
 }
-
