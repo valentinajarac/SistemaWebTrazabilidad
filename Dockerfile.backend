@@ -1,0 +1,20 @@
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+# Copiar archivos del proyecto
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+COPY src ./src/
+
+# Dar permisos de ejecución al Maven Wrapper
+RUN chmod +x mvnw
+
+# Construir la aplicación
+RUN ./mvnw clean package -DskipTests
+
+# Exponer puerto
+EXPOSE 8080
+
+# Comando para ejecutar la aplicación
+CMD ["java", "-jar", "target/trazafrutas-backend-1.0.0.jar"]

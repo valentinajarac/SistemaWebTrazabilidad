@@ -3,21 +3,22 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://backend:8080/api
-    depends_on:
-      - backend
+      - VITE_API_URL=http://localhost:8080
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
     networks:
       - trazafrutas-network
 
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -25,22 +26,35 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-      - CORS_ALLOWED_ORIGINS=http://localhost:5173
+      - SPRING_JPA_SHOW_SQL=true
+      - LANG=es_ES.UTF-8
+      - LANGUAGE=es_ES:es
+      - LC_ALL=es_ES.UTF-8
+      - FILE_ENCODING=UTF-8
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - trazafrutas-network
 
   db:
-    image: postgres:latest
+    image: postgres:16-alpine
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_DB=trazafrutas
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1234
+      - LANG=es_ES.UTF-8
+      - LANGUAGE=es_ES:es
+      - LC_ALL=es_ES.UTF-8
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - trazafrutas-network
 
