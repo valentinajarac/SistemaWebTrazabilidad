@@ -115,11 +115,20 @@ public class UserService {
             }
             existingUser.setPassword(passwordEncoder.encode(newPassword));
         }
-        // Si no se proporciona contraseña, mantener la existente (no hacer nada)
 
-        // Validar y actualizar rol
+        // Actualizar rol si se proporciona
         if (updatedUser.getRole() != null) {
             existingUser.setRole(updatedUser.getRole());
+        }
+
+        // Actualizar estado si se proporciona
+        if (updatedUser.getStatus() != null) {
+            existingUser.setStatus(updatedUser.getStatus());
+        }
+
+        // Actualizar certificaciones si se proporcionan
+        if (updatedUser.getCertifications() != null) {
+            existingUser.setCertifications(updatedUser.getCertifications());
         }
 
         return userRepository.save(existingUser);

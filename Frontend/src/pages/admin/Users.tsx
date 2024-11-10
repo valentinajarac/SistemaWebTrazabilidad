@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { User } from '../../types';
+import { User, UserStatus, Certification } from '../../types';
 import { DataTable } from '../../components/DataTable';
-import { Plus, X } from 'lucide-react';
+import { Plus, UserCircle, Building2, Key, Award } from 'lucide-react';
 import api from '../../api/config';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { SearchBar } from '../../components/SearchBar';
+import { Modal } from '../../components/ui/Modal';
+import { Tabs } from '../../components/ui/Tabs';
+
+const CERTIFICATION_OPTIONS = [
+  { value: 'FAIRTRADE_USA', label: 'Fairtrade USA' },
+  { value: 'GLOBAL_GAP', label: 'Global GAP' },
+  { value: 'ICA', label: 'ICA' }
+];
+
+type TabType = 'personal' | 'ubicacion' | 'acceso' | 'certificaciones';
 
 export const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -16,8 +26,10 @@ export const Users: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<User>();
+  const [activeTab, setActiveTab] = useState<TabType>('personal');
+
+  const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm<User>();
+  const selectedCertifications = watch('certifications') || [];
 
   useEffect(() => {
     fetchUsers();
@@ -66,16 +78,23 @@ export const Users: React.FC = () => {
   const onSubmit = async (data: User) => {
     try {
       setLoading(true);
+      
+      // Asegurarse de que las certificaciones sean un array
+      const userData = {
+        ...data,
+        certifications: Array.isArray(data.certifications) ? data.certifications : [],
+      };
+      
       const url = editingUser ? `/users/${editingUser.id}` : '/users';
       const method = editingUser ? 'put' : 'post';
       
-      const response = await api[method](url, data);
-
+      const response = await api[method](url, userData);
+      
       if (response.data.success) {
-        fetchUsers();
+        await fetchUsers();
         setShowModal(false);
-        reset();
         setEditingUser(null);
+        reset();
       } else {
         setError(response.data.message);
       }
@@ -89,8 +108,13 @@ export const Users: React.FC = () => {
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    reset(user);
+    // Asegurarse de que las certificaciones se establezcan correctamente
+    reset({
+      ...user,
+      certifications: user.certifications || []
+    });
     setShowModal(true);
+    setActiveTab('personal');
   };
 
   const handleDelete = async (user: User) => {
@@ -112,6 +136,21 @@ export const Users: React.FC = () => {
     }
   };
 
+  const handleCertificationChange = (cert: Certification) => {
+    const current = selectedCertifications || [];
+    const updated = current.includes(cert)
+      ? current.filter(c => c !== cert)
+      : [...current, cert];
+    setValue('certifications', updated);
+  };
+
+  const tabs = [
+    { id: 'personal', label: 'Datos Personales', icon: UserCircle },
+    { id: 'ubicacion', label: 'Ubicación', icon: Building2 },
+    { id: 'acceso', label: 'Acceso', icon: Key },
+    { id: 'certificaciones', label: 'Certificaciones', icon: Award }
+  ];
+
   const columns = [
     { key: 'cedula', label: 'Cédula' },
     { key: 'nombreCompleto', label: 'Nombre Completo' },
@@ -120,6 +159,26 @@ export const Users: React.FC = () => {
     { key: 'telefono', label: 'Teléfono' },
     { key: 'usuario', label: 'Usuario' },
     { key: 'role', label: 'Rol' },
+    { 
+      key: 'status', 
+      label: 'Estado',
+      render: (value: UserStatus) => value === 'ACTIVO' ? 
+        <span className="text-green-600 font-medium">Activo</span> : 
+        <span className="text-red-600 font-medium">Inactivo</span>
+    },
+    {
+      key: 'certifications',
+      label: 'Certificaciones',
+      render: (certifications: Certification[]) => (
+        <div className="flex flex-wrap gap-1">
+          {certifications?.map(cert => (
+            <span key={cert} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+              {CERTIFICATION_OPTIONS.find(opt => opt.value === cert)?.label}
+            </span>
+          ))}
+        </div>
+      )
+    }
   ];
 
   return (
@@ -137,8 +196,12 @@ export const Users: React.FC = () => {
         <Button
           onClick={() => {
             setEditingUser(null);
-            reset({});
+            reset({
+              certifications: [],
+              status: 'ACTIVO' as UserStatus
+            });
             setShowModal(true);
+            setActiveTab('personal');
           }}
           variant="primary"
           icon={Plus}
@@ -162,121 +225,220 @@ export const Users: React.FC = () => {
         loading={loading}
       />
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
-                {editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
-              </h2>
-              <button onClick={() => setShowModal(false)}>
-                <X className="w-6 h-6" />
-              </button>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title={editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
+        size="full"
+      >
+        <div className="flex flex-col h-full">
+          <Tabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={(id) => setActiveTab(id as TabType)}
+          />
+
+          <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-auto p-6">
+            {/* Datos Personales */}
+            <div className={activeTab === 'personal' ? 'block' : 'hidden'}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Cédula</label>
+                  <input
+                    type="text"
+                    {...register('cedula', { 
+                      required: 'La cédula es requerida',
+                      pattern: {
+                        value: /^\d{7,10}$/,
+                        message: 'La cédula debe tener entre 7 y 10 dígitos'
+                      }
+                    })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.cedula && (
+                    <span className="text-red-500 text-sm">{errors.cedula.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                  <input
+                    type="text"
+                    {...register('nombreCompleto', { required: 'El nombre completo es requerido' })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.nombreCompleto && (
+                    <span className="text-red-500 text-sm">{errors.nombreCompleto.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Código Trazabilidad</label>
+                  <input
+                    type="text"
+                    {...register('codigoTrazabilidad', { required: 'El código de trazabilidad es requerido' })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.codigoTrazabilidad && (
+                    <span className="text-red-500 text-sm">{errors.codigoTrazabilidad.message}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Cédula</label>
-                <input
-                  type="text"
-                  {...register('cedula', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.cedula && <span className="text-red-500 text-sm">Campo requerido</span>}
-              </div>
+            {/* Ubicación */}
+            <div className={activeTab === 'ubicacion' ? 'block' : 'hidden'}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Municipio</label>
+                  <input
+                    type="text"
+                    {...register('municipio', { required: 'El municipio es requerido' })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.municipio && (
+                    <span className="text-red-500 text-sm">{errors.municipio.message}</span>
+                  )}
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
-                <input
-                  type="text"
-                  {...register('nombreCompleto', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.nombreCompleto && <span className="text-red-500 text-sm">Campo requerido</span>}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+                  <input
+                    type="text"
+                    {...register('telefono', {
+                      required: 'El teléfono es requerido',
+                      pattern: {
+                        value: /^\d{10}$/,
+                        message: 'El teléfono debe tener 10 dígitos'
+                      }
+                    })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.telefono && (
+                    <span className="text-red-500 text-sm">{errors.telefono.message}</span>
+                  )}
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Código Trazabilidad</label>
-                <input
-                  type="text"
-                  {...register('codigoTrazabilidad', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.codigoTrazabilidad && <span className="text-red-500 text-sm">Campo requerido</span>}
+            {/* Acceso */}
+            <div className={activeTab === 'acceso' ? 'block' : 'hidden'}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Usuario</label>
+                  <input
+                    type="text"
+                    {...register('usuario', {
+                      required: 'El usuario es requerido',
+                      minLength: {
+                        value: 4,
+                        message: 'El usuario debe tener al menos 4 caracteres'
+                      }
+                    })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.usuario && (
+                    <span className="text-red-500 text-sm">{errors.usuario.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Contraseña {!editingUser && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="password"
+                    {...register('password', {
+                      required: !editingUser,
+                      minLength: {
+                        value: 6,
+                        message: 'La contraseña debe tener al menos 6 caracteres'
+                      }
+                    })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  />
+                  {errors.password && (
+                    <span className="text-red-500 text-sm">{errors.password.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Rol</label>
+                  <select
+                    {...register('role', { required: 'El rol es requerido' })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  >
+                    <option value="">Seleccione un rol</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="PRODUCER">Productor</option>
+                  </select>
+                  {errors.role && (
+                    <span className="text-red-500 text-sm">{errors.role.message}</span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Estado</label>
+                  <select
+                    {...register('status', { required: 'El estado es requerido' })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+                    disabled={loading}
+                  >
+                    <option value="ACTIVO">Activo</option>
+                    <option value="INACTIVO">Inactivo</option>
+                  </select>
+                  {errors.status && (
+                    <span className="text-red-500 text-sm">{errors.status.message}</span>
+                  )}
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Municipio</label>
-                <input
-                  type="text"
-                  {...register('municipio', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.municipio && <span className="text-red-500 text-sm">Campo requerido</span>}
+            {/* Certificaciones */}
+            <div className={activeTab === 'certificaciones' ? 'block' : 'hidden'}>
+              <div className="space-y-2">
+                {CERTIFICATION_OPTIONS.map((cert) => (
+                  <label key={cert.value} className="flex items-center space-x-2 p-2 rounded hover:bg-gray-50">
+                    <input
+                      type="checkbox"
+                      checked={selectedCertifications.includes(cert.value as Certification)}
+                      onChange={() => handleCertificationChange(cert.value as Certification)}
+                      className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    />
+                    <span className="text-sm text-gray-700">{cert.label}</span>
+                  </label>
+                ))}
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Teléfono</label>
-                <input
-                  type="text"
-                  {...register('telefono', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.telefono && <span className="text-red-500 text-sm">Campo requerido</span>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Usuario</label>
-                <input
-                  type="text"
-                  {...register('usuario', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.usuario && <span className="text-red-500 text-sm">Campo requerido</span>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input
-                  type="password"
-                  {...register('password', { required: !editingUser })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                />
-                {errors.password && <span className="text-red-500 text-sm">Campo requerido</span>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Rol</label>
-                <select
-                  {...register('role', { required: true })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                  disabled={loading}
-                >
-                  <option value="">Seleccione un rol</option>
-                  <option value="ADMIN">Administrador</option>
-                  <option value="PRODUCER">Productor</option>
-                </select>
-                {errors.role && <span className="text-red-500 text-sm">Campo requerido</span>}
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors disabled:opacity-50"
+            <div className="flex justify-end space-x-3 mt-6">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowModal(false)}
                 disabled={loading}
               >
-                {loading ? 'Guardando...' : editingUser ? 'Actualizar' : 'Crear'} Usuario
-              </button>
-            </form>
-          </div>
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+              >
+                {editingUser ? 'Actualizar' : 'Crear'} Usuario
+              </Button>
+            </div>
+          </form>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

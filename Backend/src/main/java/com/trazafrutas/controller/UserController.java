@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+import com.trazafrutas.dto.UserDTO;
 import java.util.List;
 
 @RestController
@@ -75,26 +75,21 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(
-            @PathVariable Long id,
-            @RequestBody User updatedUser,
-            @AuthenticationPrincipal User user) {
-        ResponseEntity<?> roleCheck = checkAdminRole(user);
-        if (roleCheck != null) return roleCheck;
-
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO updatedUserDTO) {
         try {
-            User result = userService.updateUser(id, updatedUser);
-            // No enviar la contraseña en la respuesta
-            result.setPassword(null);
-            return ResponseEntity.ok(new ApiResponse(true, "Usuario actualizado exitosamente", result));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, e.getMessage()));
+            // Convierte UserDTO a User antes de actualizar
+            User userEntity = updatedUserDTO.toEntity();
+            User result = userService.updateUser(id, userEntity);
+
+            // Convierte User a UserDTO para la respuesta
+            UserDTO responseUserDTO = UserDTO.fromEntity(result);
+            return ResponseEntity.ok(new ApiResponse(true, "Usuario actualizado exitosamente", responseUserDTO));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(new ApiResponse(false, "Error al actualizar el usuario: " + e.getMessage()));
+            return ResponseEntity.internalServerError().body(new ApiResponse(false, "Error al actualizar el usuario: " + e.getMessage()));
         }
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, @AuthenticationPrincipal User user) {

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Users, Warehouse, Sprout, FileText, FileSpreadsheet,
-  Leaf, TrendingUp
+  Leaf, TrendingUp, Building2, Award
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { BarChart } from '../../components/charts/BarChart';
 import { LineChart } from '../../components/charts/LineChart';
+import { PieChart } from '../../components/charts/PieChart';
 import { DashboardStats, MonthlyStats } from '../../types';
 import { dashboardService } from '../../api/services/dashboard.service';
 import { exportToExcel, exportToPDF } from '../../utils/exportUtils';
@@ -102,28 +103,34 @@ export function AdminDashboard() {
       </div>
 
       {/* Estadísticas de Productores */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card
-          title="Total Productores"
-          value={stats?.totalProductores || 0}
+          title="Productores Activos"
+          value={stats?.productoresActivos || 0}
           icon={Users}
           loading={loading}
         />
         <Card
-          title="Productores Uchuva"
-          value={stats?.productoresUchuva || 0}
-          icon={Sprout}
+          title="Certificación Fairtrade"
+          value={stats?.productoresFairtrade || 0}
+          icon={Award}
           loading={loading}
         />
         <Card
-          title="Productores Gulupa"
-          value={stats?.productoresGulupa || 0}
-          icon={Leaf}
+          title="Certificación Global GAP"
+          value={stats?.productoresGlobalGap || 0}
+          icon={Award}
+          loading={loading}
+        />
+        <Card
+          title="Certificación ICA"
+          value={stats?.productoresIca || 0}
+          icon={Award}
           loading={loading}
         />
       </div>
 
-      {/* Estadísticas Adicionales */}
+      {/* Estadísticas de Producción */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card
           title="Total Fincas"
@@ -143,6 +150,45 @@ export function AdminDashboard() {
           icon={TrendingUp}
           loading={loading}
         />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Distribución por Municipio */}
+        {stats?.produccionesPorMunicipio && (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Distribución de Productores por Municipio</h2>
+            <div className="h-96">
+              <PieChart
+                data={stats.produccionesPorMunicipio.map((item, index) => ({
+                  name: item.municipio,
+                  value: item.cantidad,
+                  color: `hsl(${index * 137.5}, 70%, 50%)`
+                }))}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Distribución por Producto */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Distribución por Producto</h2>
+          <div className="h-96">
+            <PieChart
+              data={[
+                {
+                  name: 'Productores Uchuva',
+                  value: stats?.productoresUchuva || 0,
+                  color: '#f59e0b'
+                },
+                {
+                  name: 'Productores Gulupa',
+                  value: stats?.productoresGulupa || 0,
+                  color: '#10b981'
+                }
+              ]}
+            />
+          </div>
+        </div>
       </div>
 
       {monthlyData.length > 0 && (
