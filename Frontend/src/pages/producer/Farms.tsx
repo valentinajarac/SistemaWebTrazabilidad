@@ -36,6 +36,7 @@ export function Farms() {
     const filtered = farms.filter(farm => 
       farm.nombre.toLowerCase().includes(searchTermLower) ||
       farm.municipio.toLowerCase().includes(searchTermLower) ||
+      farm.vereda.toLowerCase().includes(searchTermLower) ||
       farm.hectareas.toString().includes(searchTermLower)
     );
     setFilteredFarms(filtered);
@@ -107,7 +108,8 @@ export function Farms() {
   const columns = [
     { key: 'nombre', label: 'Nombre' },
     { key: 'hectareas', label: 'Hectáreas' },
-    { key: 'municipio', label: 'Municipio' }
+    { key: 'municipio', label: 'Municipio' },
+    { key: 'vereda', label: 'Vereda' }
   ];
 
   return (

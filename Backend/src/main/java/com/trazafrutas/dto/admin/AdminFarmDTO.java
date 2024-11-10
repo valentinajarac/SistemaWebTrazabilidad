@@ -6,18 +6,20 @@ import lombok.Data;
 @Data
 public class AdminFarmDTO {
     private Long id;
+    private String productor;
     private String nombre;
     private Double hectareas;
     private String municipio;
-    private String productor;
+    private String vereda;
 
     public static AdminFarmDTO fromEntity(Farm farm) {
         AdminFarmDTO dto = new AdminFarmDTO();
         dto.setId(farm.getId());
+        dto.setProductor(farm.getUser().getNombreCompleto());
         dto.setNombre(farm.getNombre());
         dto.setHectareas(farm.getHectareas());
         dto.setMunicipio(farm.getMunicipio());
-        dto.setProductor(farm.getUser() != null ? farm.getUser().getNombreCompleto() : "N/A");
+        dto.setVereda(farm.getVereda());
         return dto;
     }
 }

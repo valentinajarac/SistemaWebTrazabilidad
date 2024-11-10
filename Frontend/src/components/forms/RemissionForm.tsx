@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Remission, Farm, Crop, Client, ProductType } from '../../types';
+import { Remission, Farm, Crop, Client } from '../../types';
 import { Button } from '../ui/Button';
 
 interface RemissionFormProps {
@@ -24,22 +24,16 @@ export function RemissionForm({
 }: RemissionFormProps) {
   const [availableCrops, setAvailableCrops] = useState<Crop[]>([]);
 
-  const defaultValues = initialData ? {
-    fechaDespacho: initialData.fechaDespacho,
-    canastillasEnviadas: initialData.canastillasEnviadas,
-    kilosPromedio: initialData.kilosPromedio,
-    producto: initialData.producto,
-    farm: { id: initialData.farm.id },
-    crop: { id: initialData.crop.id },
-    client: { id: initialData.client.id }
-  } : {
-    fechaDespacho: new Date().toISOString().split('T')[0],
-    canastillasEnviadas: '',
-    kilosPromedio: '',
-    producto: '' as ProductType,
-    farm: { id: '' },
-    crop: { id: '' },
-    client: { id: '' }
+  const defaultValues = {
+    fechaDespacho: initialData?.fechaDespacho 
+      ? new Date(initialData.fechaDespacho).toISOString().split('T')[0] 
+      : new Date().toISOString().split('T')[0],
+    canastillasEnviadas: initialData?.canastillasEnviadas || '',
+    kilosPromedio: initialData?.kilosPromedio || '',
+    producto: initialData?.producto || '',
+    farm: { id: initialData?.farm?.id || '' },
+    crop: { id: initialData?.crop?.id || '' },
+    client: { id: initialData?.client?.id || '' }
   };
 
   const {
@@ -54,18 +48,29 @@ export function RemissionForm({
 
   const selectedFarmId = watch('farm.id');
 
+  // Actualizar cultivos disponibles cuando cambia la finca seleccionada
   useEffect(() => {
     if (selectedFarmId) {
+      // Filtrar los cultivos que pertenecen a la finca seleccionada
       const farmCrops = crops.filter(crop => 
         crop.farmId === Number(selectedFarmId)
       );
       setAvailableCrops(farmCrops);
+
+      // Limpiar el cultivo seleccionado si no está disponible en la nueva finca
+      const currentCropId = watch('crop.id');
+      if (currentCropId && !farmCrops.some(crop => crop.id === Number(currentCropId))) {
+        setValue('crop.id', '');
+        setValue('producto', '');
+      }
     } else {
       setAvailableCrops([]);
     }
-  }, [selectedFarmId, crops]);
+  }, [selectedFarmId, crops, setValue, watch]);
 
   const selectedCropId = watch('crop.id');
+  
+  // Actualizar producto cuando cambia el cultivo seleccionado
   useEffect(() => {
     if (selectedCropId) {
       const selectedCrop = crops.find(crop => crop.id === Number(selectedCropId));
@@ -128,10 +133,15 @@ export function RemissionForm({
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
           disabled={!selectedFarmId || loading}
         >
-          <option value="">Seleccione un cultivo</option>
+          <option value="">
+            {!selectedFarmId 
+              ? 'Primero seleccione una finca' 
+              : 'Seleccione un cultivo'
+            }
+          </option>
           {availableCrops.map((crop) => (
             <option key={crop.id} value={crop.id}>
-              {`${crop.producto} - ${crop.estado} (${crop.numeroPlants.toLocaleString()} plantas)`}
+              {`${crop.producto} - ${crop.estado} (${crop.numeroPlants} plantas)`}
             </option>
           ))}
         </select>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { DataTable } from '../../components/DataTable';
 import { Alert } from '../../components/ui/Alert';
 import { SearchBar } from '../../components/SearchBar';
+import { Button } from '../../components/ui/Button';
+import { FileSpreadsheet, Calendar } from 'lucide-react';
 import { Remission } from '../../types';
 import api from '../../api/config';
 import { format } from 'date-fns';
@@ -52,7 +54,7 @@ export function AdminRemissions() {
     if (selectedMonth) {
       filtered = filtered.filter(remission => {
         const remissionDate = new Date(remission.fechaDespacho);
-        const month = remissionDate.getMonth() + 1; // obtener el mes (0-11)
+        const month = remissionDate.getMonth() + 1;
         const year = remissionDate.getFullYear().toString();
         return `${year}-${month.toString().padStart(2, '0')}` === selectedMonth;
       });
@@ -82,23 +84,69 @@ export function AdminRemissions() {
     }
   };
 
+  const prepareRemissionForExport = (remission: Remission) => {
+    return {
+      'Fecha': format(new Date(remission.fechaDespacho), 'dd/MM/yyyy', { locale: es }),
+      'Productor': remission.nombreProductor || 'N/A',
+      'Finca': remission.farmNombre || 'N/A',
+      'Producto': remission.producto.charAt(0) + remission.producto.slice(1).toLowerCase(),
+      'Canastillas': remission.canastillasEnviadas,
+      'Kilos Promedio': Number(remission.kilosPromedio.toFixed(2)),
+      'Total Kilos': Number(remission.totalKilos.toFixed(2)),
+      'Cliente': remission.clientNombre || 'N/A'
+    };
+  };
+
   const exportToExcel = (data: Remission[], fileName: string) => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const exportData = data.map(prepareRemissionForExport);
+    
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    
+    // Configurar anchos de columna
+    const columnWidths = [
+      { wch: 12 },  // Fecha
+      { wch: 25 },  // Productor
+      { wch: 20 },  // Finca
+      { wch: 10 },  // Producto
+      { wch: 12 },  // Canastillas
+      { wch: 15 },  // Kilos Promedio
+      { wch: 12 },  // Total Kilos
+      { wch: 25 },  // Cliente
+    ];
+    worksheet['!cols'] = columnWidths;
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Remisiones');
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
   const exportAllRemissions = () => {
-    exportToExcel(remissions, 'Todas_Las_Remisiones');
+    if (remissions.length === 0) {
+      setError('No hay remisiones para exportar');
+      return;
+    }
+    exportToExcel(remissions, `todas_las_remisiones_${format(new Date(), 'dd-MM-yyyy')}`);
   };
 
   const exportRemissionsByMonth = () => {
-    exportToExcel(filteredRemissions, `Remisiones_${selectedMonth}`);
+    if (!selectedMonth) {
+      setError('Por favor seleccione un mes para exportar');
+      return;
+    }
+
+    if (filteredRemissions.length === 0) {
+      setError('No hay remisiones para el mes seleccionado');
+      return;
+    }
+
+    const monthDate = new Date(selectedMonth + '-01');
+    const monthName = format(monthDate, 'MMMM_yyyy', { locale: es });
+    exportToExcel(filteredRemissions, `remisiones_${monthName}`);
   };
 
   const exportSingleRemission = (remission: Remission) => {
-    exportToExcel([remission], `Remision_${remission.id}`);
+    const fileName = `remision_${remission.id}_${format(new Date(remission.fechaDespacho), 'dd-MM-yyyy')}`;
+    exportToExcel([remission], fileName);
   };
 
   const columns = [
@@ -141,14 +189,19 @@ export function AdminRemissions() {
     },
     {
       key: 'actions',
-      label: 'Acciones',
-      render: (remission: Remission) => (
-        <button
-          onClick={() => exportSingleRemission(remission)}
-          className="px-2 py-1 bg-green-500 text-white rounded"
+      label: 'Exportar',
+      render: (_: any, remission: Remission) => (
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={FileSpreadsheet}
+          onClick={(e) => {
+            e.stopPropagation();
+            exportSingleRemission(remission);
+          }}
         >
-          Exportar
-        </button>
+          Excel
+        </Button>
       )
     }
   ];
@@ -157,26 +210,41 @@ export function AdminRemissions() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Remisiones</h1>
-        <div className="flex space-x-2">
-          <button 
-            onClick={exportAllRemissions} 
-            className="px-4 py-2 bg-green-600 text-white rounded"
+        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="flex-1 sm:flex-none">
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-gray-500" />
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              icon={FileSpreadsheet}
+              onClick={exportRemissionsByMonth}
+              disabled={loading}
+              className="whitespace-nowrap"
+            >
+              <span className="hidden sm:inline">Exportar Mes</span>
+              <span className="sm:hidden">Mes</span>
+            </Button>
+          </div>
+
+          <Button
+            variant="secondary"
+            icon={FileSpreadsheet}
+            onClick={exportAllRemissions}
+            disabled={loading}
+            className="whitespace-nowrap"
           >
-            Exportar todas
-          </button>
-          <button 
-            onClick={exportRemissionsByMonth} 
-            className="px-4 py-2 bg-green-500 text-white rounded"
-          >
-            Exportar mes
-          </button>
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            placeholder="Seleccione mes"
-            className="border px-2 py-1 rounded"
-          />
+            <span className="hidden sm:inline">Exportar Todo</span>
+            <span className="sm:hidden">Todo</span>
+          </Button>
         </div>
       </div>
 

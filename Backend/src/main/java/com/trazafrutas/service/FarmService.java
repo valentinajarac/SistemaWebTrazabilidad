@@ -91,6 +91,12 @@ public class FarmService {
             }
             existingFarm.setHectareas(updatedFarm.getHectareas());
         }
+        if (updatedFarm.getVereda() != null) {
+            if (updatedFarm.getVereda().trim().isEmpty()) {
+                throw new IllegalArgumentException("La Vereda no puede estar vacía");
+            }
+            existingFarm.setVereda(updatedFarm.getVereda());
+        }
         if (updatedFarm.getMunicipio() != null) {
             if (updatedFarm.getMunicipio().trim().isEmpty()) {
                 throw new IllegalArgumentException("El municipio no puede estar vacío");

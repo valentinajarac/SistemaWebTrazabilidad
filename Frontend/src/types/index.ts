@@ -7,6 +7,8 @@ export * from './producer.types';
 export type Role = 'ADMIN' | 'PRODUCER';
 export type ProductType = 'UCHUVA' | 'GULUPA';
 export type CropStatus = 'PRODUCCION' | 'VEGETACION';
+export type UserStatus = 'ACTIVO' | 'INACTIVO';
+export type Certification = 'FAIRTRADE_USA' | 'GLOBAL_GAP' | 'ICA';
 
 // Interfaces principales
 export interface User {
@@ -19,6 +21,8 @@ export interface User {
   usuario: string;
   password?: string;
   role: Role;
+  status: UserStatus;
+  certifications: Certification[];
 }
 
 export interface Farm {
@@ -26,6 +30,7 @@ export interface Farm {
   nombre: string;
   hectareas: number;
   municipio: string;
+  vereda: string;
   user?: User;
 }
 
@@ -35,11 +40,9 @@ export interface Crop {
   hectareas: number;
   producto: ProductType;
   estado: CropStatus;
-  farmId: number;
-  farmNombre: string;  
-  userId?: number;
+  farm: Farm;
+  user?: User;
 }
-
 
 export interface Client {
   id: number;

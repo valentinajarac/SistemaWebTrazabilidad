@@ -20,6 +20,9 @@ public class Farm {
     @Column(name = "municipio")
     private String municipio;
 
+    @Column(name = "vereda")
+    private String vereda;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

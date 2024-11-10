@@ -31,7 +31,8 @@ export function AdminFarms() {
       farm.productor?.toLowerCase().includes(searchTermLower) ||
       farm.nombre.toLowerCase().includes(searchTermLower) ||
       farm.hectareas.toString().includes(searchTermLower) ||
-      farm.municipio.toLowerCase().includes(searchTermLower)
+      farm.municipio.toLowerCase().includes(searchTermLower) ||
+      farm.vereda.toLowerCase().includes(searchTermLower)
     );
     setFilteredFarms(filtered);
   };
@@ -73,6 +74,10 @@ export function AdminFarms() {
     { 
       key: 'municipio', 
       label: 'Municipio'
+    },
+    {
+      key: 'vereda',
+      label: 'Vereda'
     }
   ];
 

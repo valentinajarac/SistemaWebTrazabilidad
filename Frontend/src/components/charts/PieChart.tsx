@@ -15,9 +15,14 @@ interface PieChartProps {
     color: string;
   }[];
   height?: number;
+  valueFormatter?: (value: number) => string;
 }
 
-export function PieChart({ data, height = 400 }: PieChartProps) {
+export function PieChart({ 
+  data, 
+  height = 400,
+  valueFormatter = (value) => value.toString()
+}: PieChartProps) {
   return (
     <div style={{ width: '100%', height }}>
       <ResponsiveContainer>
@@ -27,7 +32,7 @@ export function PieChart({ data, height = 400 }: PieChartProps) {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
             outerRadius={150}
             fill="#8884d8"
             dataKey="value"
@@ -36,7 +41,9 @@ export function PieChart({ data, height = 400 }: PieChartProps) {
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => `${value.toFixed(2)} kg`} />
+          <Tooltip 
+            formatter={(value: number) => [valueFormatter(value), '']}
+          />
           <Legend />
         </RechartsPieChart>
       </ResponsiveContainer>
