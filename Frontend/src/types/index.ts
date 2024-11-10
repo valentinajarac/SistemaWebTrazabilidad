@@ -38,11 +38,14 @@ export interface Crop {
   id: number;
   numeroPlants: number;
   hectareas: number;
+  fechaSiembra: string;
   producto: ProductType;
   estado: CropStatus;
   farm: Farm;
+  farmNombre?: string;
   user?: User;
 }
+
 
 export interface Client {
   id: number;

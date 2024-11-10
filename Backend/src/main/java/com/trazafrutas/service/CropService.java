@@ -95,6 +95,7 @@ public class CropService {
         }
 
         crop.setFarm(farm);
+        // El estado se actualizará automáticamente por el trigger de la base de datos
         return cropRepository.save(crop);
     }
 
@@ -149,8 +150,9 @@ public class CropService {
             existingCrop.setProducto(updatedCrop.getProducto());
         }
 
-        if (updatedCrop.getEstado() != null) {
-            existingCrop.setEstado(updatedCrop.getEstado());
+        if (updatedCrop.getFechaSiembra() != null) {
+            existingCrop.setFechaSiembra(updatedCrop.getFechaSiembra());
+            // El estado se actualizará automáticamente por el trigger de la base de datos
         }
 
         if (updatedCrop.getFarm() != null) {
@@ -205,8 +207,8 @@ public class CropService {
             errors.append("El producto es requerido. ");
         }
 
-        if (crop.getEstado() == null) {
-            errors.append("El estado es requerido. ");
+        if (crop.getFechaSiembra() == null) {
+            errors.append("La fecha de siembra es requerida. ");
         }
 
         if (crop.getFarm() == null || crop.getFarm().getId() == null) {

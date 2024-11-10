@@ -2,6 +2,7 @@ package com.trazafrutas.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDate;
 import com.trazafrutas.model.enums.ProductType;
 import com.trazafrutas.model.enums.CropStatus;
 
@@ -15,6 +16,9 @@ public class Crop {
 
     @Column(name = "numero_plants")
     private Integer numeroPlants;
+
+    @Column(name = "fecha_siembra", nullable = false)
+    private LocalDate fechaSiembra;
 
     @Column(name = "hectareas")
     private Double hectareas;

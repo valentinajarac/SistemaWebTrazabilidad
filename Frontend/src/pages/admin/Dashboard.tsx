@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, Warehouse, Sprout, FileText, FileSpreadsheet,
-  Leaf, TrendingUp, Building2, Award
+  Leaf, TrendingUp, Building2, Award, Trees
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -131,7 +131,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Estadísticas de Producción */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card
           title="Total Fincas"
           value={stats?.totalFincas || 0}
@@ -141,13 +141,19 @@ export function AdminDashboard() {
         <Card
           title="Total Cultivos"
           value={stats?.totalCultivos || 0}
+          icon={Trees}
+          loading={loading}
+        />
+        <Card
+          title="Cultivos en Producción"
+          value={stats?.cultivosProduccion || 0}
           icon={Sprout}
           loading={loading}
         />
         <Card
-          title="Despachos del Mes"
-          value={stats?.despachosMes || 0}
-          icon={TrendingUp}
+          title="Cultivos en Vegetación"
+          value={stats?.cultivosVegetacion || 0}
+          icon={Leaf}
           loading={loading}
         />
       </div>
@@ -164,6 +170,7 @@ export function AdminDashboard() {
                   value: item.cantidad,
                   color: `hsl(${index * 137.5}, 70%, 50%)`
                 }))}
+                valueFormatter={(value) => `${value} productores`}
               />
             </div>
           </div>
@@ -186,6 +193,7 @@ export function AdminDashboard() {
                   color: '#10b981'
                 }
               ]}
+              valueFormatter={(value) => `${value} productores`}
             />
           </div>
         </div>

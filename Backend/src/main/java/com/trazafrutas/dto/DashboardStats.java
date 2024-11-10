@@ -28,6 +28,8 @@ public class DashboardStats {
     // Estadísticas de fincas y cultivos
     private Long totalFincas;
     private Long totalCultivos;
+    private Long cultivosProduccion;
+    private Long cultivosVegetacion;
     private Long cultivosUchuva;
     private Long cultivosGulupa;
 

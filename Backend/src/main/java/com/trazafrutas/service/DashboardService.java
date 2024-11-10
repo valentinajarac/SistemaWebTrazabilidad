@@ -6,6 +6,7 @@ import com.trazafrutas.dto.CurrentMonthStats;
 import com.trazafrutas.model.enums.Role;
 import com.trazafrutas.model.enums.UserStatus;
 import com.trazafrutas.model.enums.ProductType;
+import com.trazafrutas.model.enums.CropStatus;
 import com.trazafrutas.model.enums.Certification;
 import com.trazafrutas.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,8 @@ public class DashboardService {
         // Estadísticas de fincas y cultivos
         stats.setTotalFincas(farmRepository.count());
         stats.setTotalCultivos(cropRepository.count());
+        stats.setCultivosProduccion(cropRepository.countByEstado(CropStatus.PRODUCCION));
+        stats.setCultivosVegetacion(cropRepository.countByEstado(CropStatus.VEGETACION));
         stats.setCultivosUchuva(cropRepository.countByProducto(ProductType.UCHUVA));
         stats.setCultivosGulupa(cropRepository.countByProducto(ProductType.GULUPA));
 

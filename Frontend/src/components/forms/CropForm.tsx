@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Crop, Farm, ProductType, CropStatus } from '../../types';
+import { Crop, Farm } from '../../types';
 import { Button } from '../ui/Button';
 
 interface CropFormProps {
@@ -11,13 +11,24 @@ interface CropFormProps {
   loading?: boolean;
 }
 
-export function CropForm({ onSubmit, initialData, farms, onClose, loading }: CropFormProps) {
+export function CropForm({
+  onSubmit,
+  initialData,
+  farms,
+  onClose,
+  loading
+}: CropFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm<Omit<Crop, 'id'>>({
-    defaultValues: initialData || {}
+    defaultValues: {
+      ...initialData,
+      fechaSiembra: initialData?.fechaSiembra 
+        ? initialData.fechaSiembra.split('T')[0]
+        : new Date().toISOString().split('T')[0]
+    }
   });
 
   return (
@@ -90,6 +101,23 @@ export function CropForm({ onSubmit, initialData, farms, onClose, loading }: Cro
 
       <div>
         <label className="block text-sm font-medium text-gray-700">
+          Fecha de Siembra
+        </label>
+        <input
+          type="date"
+          {...register('fechaSiembra', {
+            required: 'La fecha de siembra es requerida'
+          })}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
+          disabled={loading}
+        />
+        {errors.fechaSiembra && (
+          <span className="text-red-500 text-sm">{errors.fechaSiembra.message}</span>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
           Producto
         </label>
         <select
@@ -105,26 +133,6 @@ export function CropForm({ onSubmit, initialData, farms, onClose, loading }: Cro
         </select>
         {errors.producto && (
           <span className="text-red-500 text-sm">{errors.producto.message}</span>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Estado
-        </label>
-        <select
-          {...register('estado', {
-            required: 'Debe seleccionar un estado'
-          })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-          disabled={loading}
-        >
-          <option value="">Seleccione un estado</option>
-          <option value="PRODUCCION">Producción</option>
-          <option value="VEGETACION">Vegetación</option>
-        </select>
-        {errors.estado && (
-          <span className="text-red-500 text-sm">{errors.estado.message}</span>
         )}
       </div>
 
