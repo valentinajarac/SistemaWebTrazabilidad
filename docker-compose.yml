@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: trazafrutas-db
+    environment:
+      POSTGRES_DB: trazafrutas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_ENCODING: UTF8
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - trazafrutas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d trazafrutas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    command: 
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+      - "-c"
+      - "client_encoding=UTF8"
+
+  backend:
+    build: 
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: trazafrutas-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/trazafrutas
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_CLEAN_DISABLED: "false"
+      SPRING_FLYWAY_CLEAN_ON_VALIDATION_ERROR: "true"
+      SPRING_FLYWAY_VALIDATE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_OUT_OF_ORDER: "true"
+      SPRING_FLYWAY_ENCODING: "UTF-8"
+      TZ: UTC
+    ports:
+      - "8080:8080"
+    networks:
+      - trazafrutas-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: trazafrutas_postgres_data
+
+networks:
+  trazafrutas-network:
+    name: trazafrutas_network
+    driver: bridge
