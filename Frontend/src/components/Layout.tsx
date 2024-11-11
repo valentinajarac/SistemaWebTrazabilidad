@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -6,7 +6,9 @@ import {
   Warehouse,
   Sprout, 
   ClipboardList, 
-  LogOut 
+  LogOut,
+  Menu,
+  X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,6 +20,7 @@ export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin, logout } = useAuth();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const menuItems = isAdmin ? [
     { icon: Home, label: 'Dashboard', path: '/admin' },
@@ -38,10 +41,35 @@ export function Layout({ children }: LayoutProps) {
     navigate('/login');
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Barra lateral izquierda */}
-      <aside className="w-64 bg-gray-900 text-white">
+      {/* Botón de menú móvil */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+        aria-label="Toggle menu"
+      >
+        {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+
+      {/* Overlay para cerrar el menú en móvil */}
+      {isSidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Barra lateral */}
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      >
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-center h-32 bg-gray-800 p-4">
@@ -57,7 +85,10 @@ export function Layout({ children }: LayoutProps) {
             {menuItems.map((item) => (
               <button
                 key={item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => {
+                  navigate(item.path);
+                  setIsSidebarOpen(false);
+                }}
                 className={`flex items-center w-full px-4 py-3 text-sm rounded-lg transition-colors ${
                   location.pathname === item.path
                     ? 'bg-green-600 text-white'
@@ -85,7 +116,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Contenido principal */}
       <main className="flex-1 overflow-auto">
-        <div className="container mx-auto px-6 py-8">
+        <div className="container mx-auto px-6 py-8 md:py-8">
           {children}
         </div>
       </main>
