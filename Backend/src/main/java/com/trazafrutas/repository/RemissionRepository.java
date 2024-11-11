@@ -11,6 +11,12 @@ import java.util.List;
 public interface RemissionRepository extends JpaRepository<Remission, Long> {
     List<Remission> findByUserId(Long userId);
 
+    @Query("SELECT COUNT(r) FROM Remission r WHERE r.user.id = :userId")
+    Long countByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COALESCE(SUM(r.totalKilos), 0.0) FROM Remission r WHERE r.user.id = :userId")
+    Double sumTotalKilosByUserId(@Param("userId") Long userId);
+
     @Query("""
         SELECT new com.trazafrutas.dto.MonthlyStats(
             date_trunc('month', r.fechaDespacho),

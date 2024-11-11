@@ -7,12 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -28,6 +32,7 @@ public class UserService {
     @Transactional
     public User createUser(User user) {
         validateUserData(user);
+        logger.debug("Validando datos de nuevo usuario: {}", user.getUsuario());
 
         // Verificar duplicados
         if (userRepository.existsByUsuario(user.getUsuario())) {
@@ -41,14 +46,26 @@ public class UserService {
         }
 
         // Encriptar contraseña
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String rawPassword = user.getPassword();
+        if (rawPassword == null || rawPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es requerida");
+        }
 
-        return userRepository.save(user);
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        user.setPassword(encodedPassword);
+
+        logger.debug("Contraseña encriptada para usuario: {}", user.getUsuario());
+
+        User savedUser = userRepository.save(user);
+        logger.debug("Usuario guardado exitosamente: {}", savedUser.getUsuario());
+
+        return savedUser;
     }
 
     @Transactional
     public User updateUser(Long id, User updatedUser) {
         User existingUser = getUserById(id);
+        logger.debug("Actualizando usuario: {}", existingUser.getUsuario());
 
         // Validar y actualizar cédula
         if (updatedUser.getCedula() != null) {
@@ -114,6 +131,7 @@ public class UserService {
                 throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
             }
             existingUser.setPassword(passwordEncoder.encode(newPassword));
+            logger.debug("Contraseña actualizada para usuario: {}", existingUser.getUsuario());
         }
 
         // Actualizar rol si se proporciona
@@ -131,7 +149,10 @@ public class UserService {
             existingUser.setCertifications(updatedUser.getCertifications());
         }
 
-        return userRepository.save(existingUser);
+        User savedUser = userRepository.save(existingUser);
+        logger.debug("Usuario actualizado exitosamente: {}", savedUser.getUsuario());
+
+        return savedUser;
     }
 
     @Transactional
@@ -140,6 +161,7 @@ public class UserService {
             throw new EntityNotFoundException("Usuario no encontrado con ID: " + id);
         }
         userRepository.deleteById(id);
+        logger.debug("Usuario eliminado exitosamente, ID: {}", id);
     }
 
     private void validateUserData(User user) {
